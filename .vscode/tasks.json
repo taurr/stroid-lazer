@@ -1,0 +1,39 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run stroid-lazer",
+			"detail": "Run debug version of stroid-lazer.",
+			"type": "cargo",
+			"command": "run",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"env": {
+				"RUST_LOG": "info,wgpu=warn,stroid_lazer=debug"},
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Play stroid-lazer",
+			"detail": "Start a new game directly",
+			"type": "cargo",
+			"command": "run",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"env": {
+				"RUST_LOG": "info,wgpu=warn,stroid_lazer=debug"
+			},
+			"args": ["--features", "cmd_line", "--", "--play"],
+			"isBackground": true,
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		}
+	]
+}
