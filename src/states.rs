@@ -1,5 +1,5 @@
 use avian2d::prelude::{AngularVelocity, LinearVelocity};
-use bevy::{prelude::*, render::camera::ScalingMode};
+use bevy::{prelude::*, render::camera::ScalingMode, window::PrimaryWindow};
 use bevy_asset_loader::prelude::*;
 use bevy_turborand::{GlobalRng, RngComponent};
 use tracing::instrument;
@@ -108,6 +108,10 @@ impl Plugin for GameStatesPlugin {
         .add_systems(
             OnEnter(PlayState::Running),
             resume_movement.in_set(GameStatesSet),
+        )
+        .add_systems(
+            Update,
+            pause_when_window_looses_focus.run_if(in_state(GameState::Playing)),
         )
         .add_systems(
             PostUpdate,
@@ -350,6 +354,24 @@ fn detect_level_cleared(
             info!(next_level, "level cleared, starting next level");
             **current_level = next_level.clone();
             next.set(PlayState::StartNextLevel);
+        }
+    }
+}
+
+fn pause_when_window_looses_focus(
+    query: Query<&Window, With<PrimaryWindow>>,
+    state: Res<State<PlayState>>,
+    mut next_state: ResMut<NextState<PlayState>>,
+) {
+    if let Ok(window) = query.get_single() {
+        match (state.get(), window.focused) {
+            (PlayState::CountdownBeforeRunning, false) => {
+                next_state.set(PlayState::Paused);
+            }
+            (PlayState::Running, false) => {
+                next_state.set(PlayState::Paused);
+            }
+            (_, _) => {}
         }
     }
 }

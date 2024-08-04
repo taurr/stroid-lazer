@@ -1,5 +1,5 @@
 use avian2d::prelude::*;
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 use bevy_turborand::prelude::RngPlugin;
 use bevy_tweening::TweeningPlugin;
 use derive_more::{Deref, DerefMut};
@@ -46,24 +46,6 @@ pub enum CollisionLayer {
     Asteroids,
 }
 
-fn print_window_stats(
-    query: Query<&Window, With<PrimaryWindow>>,
-    state: Res<State<PlayState>>,
-    mut next_state: ResMut<NextState<PlayState>>,
-) {
-    if let Ok(window) = query.get_single() {
-        match (state.get(), window.focused) {
-            (PlayState::CountdownBeforeRunning, false) => {
-                next_state.set(PlayState::Paused);
-            }
-            (PlayState::Running, false) => {
-                next_state.set(PlayState::Paused);
-            }
-            (_, _) => {}
-        }
-    }
-}
-
 fn main() -> AppExit {
     let mut app = App::new();
 
@@ -95,11 +77,6 @@ fn main() -> AppExit {
         AsteroidPlugin,
         UiPlugin,
     ));
-
-    app.add_systems(
-        Update,
-        print_window_stats.run_if(in_state(GameState::Playing)),
-    );
 
     add_features(&mut app);
     app.run()
