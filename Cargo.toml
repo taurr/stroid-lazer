@@ -3,34 +3,51 @@ name = "stroid-lazer"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-rand = "0.8.5"
-smart-default = "0.7.1"
+itertools = "0.13.0"
 derive_more = "0.99.17"
+smart-default = "0.7.1"
+enum-ordinalize = "4.3.0"
 serde = { version = "1.0.198" }
-anyhow = "1.0.82"
 ron = "0.8"
 tracing = "0.1.40"
+anyhow = "1.0.86"
 
-bevy = { version = "0.13.2"}
-bevy_asset_loader = { version="0.20.1", features=["2d", "standard_dynamic_assets"]}
-bevy_common_assets = { version = "0.10", features = ["ron"] }
+bevy = { version = "0.14.1", features = ["bevy_dev_tools"]}
+bevy_asset_loader = { version = "0.21.0", features = [
+    "2d",
+    "standard_dynamic_assets",
+] }
+bevy_common_assets = { version = "0.11.0", features = ["ron"] }
+avian2d = { version = "0.1.1", features = ["serialize"] }
+bevy_turborand = "0.9.0"
+leafwing-input-manager = "0.14.0"
+bevy_tweening = "0.11.0"
 
-bevy_editor_pls = {version="0.8.1", optional = true}
-iyes_perf_ui = {version ="0.2.3", optional = true}
+bevy-inspector-egui = { version = "0.25.1", optional = true }
+bevy_editor_pls = { version = "0.8.1", optional = true }
+iyes_perf_ui = { version = "0.3.0", optional = true }
+clap = { version = "4.5.11", features = ["derive"], optional = true }
 
 [dev-dependencies]
+rstest = "0.21.0"
+
+[lints.clippy]
+type_complexity = "allow"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
-opt-level = 1
+opt-level = 0
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
 
 [features]
-editor = ["bevy_editor_pls"]
-perf = ["iyes_perf_ui"]
+default = ["cmd_line", ]
+
+cmd_line = ["clap"]
+dbg_colliders = [] # show colliders
+inspector = ["bevy-inspector-egui"] # inspect components etc.
+editor = ["bevy_editor_pls"] # currently not working!
+perf = ["iyes_perf_ui"] # show fps etc.

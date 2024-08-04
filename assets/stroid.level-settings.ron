@@ -1,0 +1,41 @@
+({
+    "Training Wheels": (
+        //player: ( // ONLY for this 1 level!
+        //    spawn_position: (0, 0),
+        //    safe_radius: 100,
+        //),
+        startup: (
+            asteroids: (
+                count: Exact(5),
+                select_from: [
+                    Pool(name: "starter-asteroid-pool"),
+                ],
+            ),
+        ),
+        next_level: "Rookie",
+    ),
+    "Rookie": (
+        startup: (
+            asteroids: (
+                count: Exact(7),
+                select_from: [
+                    Pool(name: "starter-asteroid-pool", weight: 0.8),
+                    Pool(name: "mid-asteroid-pool", weight: 0.2),
+                ],
+            ),
+        ),
+        next_level: "Yiihaaa!!!",
+    ),
+    "Yiihaaa!!!": (
+        startup: (
+            asteroids: (
+                count: Exact(10),
+                select_from: [
+                    Pool(name: "starter-asteroid-pool", weight: 0.7),
+                    Pool(name: "mid-asteroid-pool", weight: 0.2),
+                    Pool(name: "trick-final-asteroid-pool", weight: 0.1),
+                ],
+            ),
+        ),
+    ),
+})

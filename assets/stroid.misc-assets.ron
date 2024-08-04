@@ -1,0 +1,8 @@
+({
+    "game-settings": File(path: "stroid.game-settings.ron"),
+    "game-levels": File(path: "stroid.level-settings.ron"),
+    "input-key-settings": File(path: "stroid.input-key-settings.ron"),
+    "weapon-settings": File(path:"stroid.weapon-settings.ron"),
+    "ammonition-settings": File(path:"stroid.ammonition-settings.ron"),
+    "asteroid-settings": File(path:"stroid.asteroid-pool-settings.ron"),
+})

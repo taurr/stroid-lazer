@@ -1,0 +1,43 @@
+(
+    game_start: (
+        lives: 3,
+        level: "Training Wheels",
+        weapon_idx: 1,
+        // TODO: move to a GeneralSettings section
+        minimum_countdown_duration: (
+            secs: 1,
+            nanos: 0,
+        ),
+        // TODO: move to a GeneralSettings section
+        countdown_duration: (
+            secs: 3,
+            nanos: 0,
+        ),
+    ),
+    level_defaults: (
+        player: (
+            spawn_position: (0, 0),
+            safe_radius: 200,
+            speed_range: (start: 25.0, end: 600.0),
+            acceleration: 250.0,
+            speed_decay: 0.0,
+            rotation_speed: 3.141562,
+            rotation_speed_acceleration: 15.7,
+            // TODO: move to a GeneralSettings section
+            jump_animation_duration: (
+                secs: 2,
+                nanos: 0,
+            ),
+        ),
+    ),
+    game_area: (
+        border_area: (
+            min: (61.0, 61.0), // left, top border
+            max: (61.0, 61.0), // right, bottom border
+        ),
+        game_area: (
+            min: (-500.0, -500.0, 0.0),
+            max: (500.0, 500.0, 0.0),
+        ),
+    ),
+)

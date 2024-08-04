@@ -1,0 +1,18 @@
+([
+    (
+        spritesheet_idx: 0,
+        speed: 1000.0,
+        timeout: (
+            secs: 0,
+            nanos: 650000000,
+        ),
+    ),
+    (
+        spritesheet_idx: 1,
+        speed: 2000.0,
+        timeout: (
+            secs: 1,
+            nanos: 500000000,
+        ),
+    ),
+])

@@ -1,0 +1,9 @@
+(
+    auto_fire: (secs:0,nanos:333000000),
+    rotate_left: ArrowLeft,
+    rotate_right: ArrowRight,
+    accelerate: ArrowUp,
+    fire: Space,
+    jump: Enter,
+    pause: Escape,
+)

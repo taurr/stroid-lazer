@@ -1,61 +1,132 @@
-use self::prelude::*;
-use bevy::{prelude::*, render::camera::ScalingMode};
-use bevy_asset_loader::prelude::*;
+use avian2d::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
+use bevy_turborand::prelude::RngPlugin;
+use bevy_tweening::TweeningPlugin;
+use derive_more::{Deref, DerefMut};
 
+#[cfg(feature = "cmd_line")]
+mod args;
+
+mod assets;
 mod asteroid;
-mod controls;
+mod constants;
 mod movement;
 mod player;
-mod prelude;
 mod projectile;
-mod settings;
+mod states;
+mod tween_events;
+mod ui;
+mod utils;
 
-#[derive(Debug, Clone, SystemSet, PartialEq, Eq, Hash)]
-enum GameSet {
-    PreSpawn,
-    Spawn,
-    Input,
-    Movement,
-    Cleanup,
+use self::{
+    assets::GameAssetsPlugin,
+    asteroid::AsteroidPlugin,
+    movement::MovementPlugin,
+    player::PlayerPlugin,
+    projectile::ProjectilePlugin,
+    states::{GameOverReason, GameState, GameStatesPlugin, PlayState},
+    tween_events::TweenCompletedPlugin,
+    ui::UiPlugin,
+};
+
+#[derive(Component, Debug)]
+struct PlayingField;
+
+#[derive(Resource, Debug, Default, Clone, Deref, DerefMut)]
+pub struct GameLevel {
+    #[deref]
+    #[deref_mut]
+    pub current: String,
 }
 
-#[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
-enum GameState {
-    #[default]
-    AssetLoading,
-    //Menu,
-    Playing,
-    //GameOver,
+#[derive(PhysicsLayer)]
+pub enum CollisionLayer {
+    Player,
+    Laser,
+    Asteroids,
 }
 
-#[derive(Debug, Component)]
-pub struct PlayingField;
+fn print_window_stats(
+    query: Query<&Window, With<PrimaryWindow>>,
+    state: Res<State<PlayState>>,
+    mut next_state: ResMut<NextState<PlayState>>,
+) {
+    if let Ok(window) = query.get_single() {
+        match (state.get(), window.focused) {
+            (PlayState::CountdownBeforeRunning, false) => {
+                next_state.set(PlayState::Paused);
+            }
+            (PlayState::Running, false) => {
+                next_state.set(PlayState::Paused);
+            }
+            (_, _) => {}
+        }
+    }
+}
 
-fn main() {
+fn main() -> AppExit {
     let mut app = App::new();
-    app.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.1)))
-        .init_state::<GameState>()
+
+    app.init_resource::<GameLevel>()
+        .insert_resource(ClearColor(bevy::color::palettes::css::BLACK.into()))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Stroid-Lazer".into(),
                 resolution: Vec2::new(800., 800.).into(),
+                present_mode: bevy::window::PresentMode::Fifo,
+                resize_constraints: WindowResizeConstraints {
+                    min_width: 550.0,
+                    min_height: 400.0,
+                    ..Default::default()
+                },
                 ..default()
             }),
             ..default()
         }))
-        .add_loading_state(
-            LoadingState::new(GameState::AssetLoading).continue_to_state(GameState::Playing),
-        )
-        .add_plugins((
-            LevelPlugin,
-            MovementPlugin,
-            ControlsPlugin,
-            PlayerPlugin,
-            ProjectilePlugin,
-            AsteroidPlugin,
-        ))
-        .add_systems(OnExit(GameState::AssetLoading), setup_playing_field)
-        .add_systems(Startup, setup_camera);
+        .add_plugins((RngPlugin::default(), TweeningPlugin));
+
+    app.add_plugins((
+        GameStatesPlugin,
+        GameAssetsPlugin,
+        TweenCompletedPlugin,
+        MovementPlugin,
+        PlayerPlugin,
+        ProjectilePlugin,
+        AsteroidPlugin,
+        UiPlugin,
+    ));
+
+    app.add_systems(
+        Update,
+        print_window_stats.run_if(in_state(GameState::Playing)),
+    );
+
+    add_features(&mut app);
+    app.run()
+}
+
+#[allow(unused)]
+fn add_features(app: &mut App) {
+    #[cfg(feature = "cmd_line")]
+    app.insert_resource(<args::Args as clap::Parser>::parse());
+
+    app.add_systems(
+        Last,
+        (
+            bevy::dev_tools::states::log_transitions::<GameState>,
+            bevy::dev_tools::states::log_transitions::<PlayState>,
+        ),
+    );
+
+    #[cfg(feature = "inspector")]
+    app.add_plugins((
+        bevy_inspector_egui::quick::WorldInspectorPlugin::new(),
+        //bevy_inspector_egui::quick::AssetInspectorPlugin::<assets::SpriteSheet>::default(),
+        //ResourceInspectorPlugin::<AsteroidAssets>::default(),
+    ));
+
+    #[cfg(feature = "dbg_colliders")]
+    app.add_plugins(PhysicsDebugPlugin::default());
 
     #[cfg(feature = "editor")]
     app.add_plugins(bevy_editor_pls::EditorPlugin::default());
@@ -67,53 +138,4 @@ fn main() {
         bevy::diagnostic::SystemInformationDiagnosticsPlugin,
         iyes_perf_ui::PerfUiPlugin,
     ));
-
-    app.configure_sets(StateTransition, GameSet::PreSpawn.before(GameSet::Spawn));
-    app.configure_sets(Update, GameSet::PreSpawn.before(GameSet::Spawn));
-    app.configure_sets(Update, GameSet::Input.before(GameSet::Movement));
-    app.configure_sets(Update, GameSet::Cleanup.after(GameSet::Movement));
-
-    app.run();
-}
-
-fn setup_camera(mut commands: Commands) {
-    debug!("setting up camera");
-
-    #[cfg(feature = "perf")]
-    commands.spawn(iyes_perf_ui::PerfUiCompleteBundle::default());
-
-    commands.spawn(Camera2dBundle {
-        projection: OrthographicProjection {
-            near: -100.0,
-            far: 100.0,
-            ..default()
-        },
-        ..default()
-    });
-}
-
-fn setup_playing_field(
-    settings: Res<GameSettings>,
-    mut projection_query: Query<&mut OrthographicProjection, With<Camera2d>>,
-    mut commands: Commands,
-) {
-    debug!("setting up playing field");
-    commands.spawn((
-        Name::new("PlayingField"),
-        PlayingField,
-        settings.game_area.clone(),
-        SpatialBundle::default(),
-    ));
-
-    let mut projection = projection_query.single_mut();
-    projection.scaling_mode = ScalingMode::AutoMin {
-        min_width: settings.game_area.width(),
-        min_height: settings.game_area.height(),
-    };
-}
-
-pub fn despawn_with<T: Component>(mut commands: Commands, query: Query<Entity, With<T>>) {
-    for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
-    }
 }

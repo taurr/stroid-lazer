@@ -1,0 +1,175 @@
+({
+    "player-sheet": SpriteSheet((
+        name: "Spaceship",
+        texture: "images/spiked ship 3.small.green.png",
+        //anchor: Center,
+        size: (75, 75),
+        //flip_x: false,
+        //flip_y: false,
+        //color: Srgba((
+        //    red: 1, green: 0, blue: 0, alpha: 1
+        //)),
+        //sampler: Linear,
+        //position: (0, 0, 0),
+        rotation: -1.5707963248,
+        //atlas: (
+        //    layout: (
+        //        size: (50, 50),
+        //        columns: 1,
+        //        rows: 2,
+        //        //padding: (x, y)
+        //        //offset: (x, y)
+        //    ),
+        //    //index: 0,
+        //    //texture_count: 1,
+        //),
+        physics: [
+            (
+                collider: Circle(6),
+                //density: 1.0
+                //margin: 10.5
+                //friction: (dynamic_coefficient: 1, static_coefficient: 1, Multiply)
+                //restitution: (coefficient: 1, Multiply),
+                position: (26, -5),
+                //rotation: 0
+            ),
+            (
+                collider: Circle(6),
+                position: (-26, -5),
+            ),
+            (
+                collider: Rectangle(x: 10, y:35),
+                position: (0, -10)
+            ),
+            (
+                collider: Rectangle(x: 2, y:24),
+                position: (23, 15),
+                rotation: 0.18
+            ),
+            (
+                collider: Rectangle(x: 2, y:24),
+                position: (-23, 15),
+                rotation: -0.18
+            ),
+        ],
+    )),
+
+    "flames-sheet": SpriteSheet((
+        name: "Rocket Flames",
+        texture: "images/rocket_fire.png",
+        size: (35, 50),
+        anchor: TopCenter,
+        position: (-37, -2, -1),
+        rotation: -1.5707963248,
+        color: Srgba((red:1,green:1,blue:1,alpha:0.66)),
+    )),
+
+    "ammonition-sheets": AmmonitionSpriteSheets([
+        (
+            name: "Ammonition",
+            texture: "images/beams.png",
+            rotation: -1.5707963248,
+            atlas: (
+                layout: (
+                    size: (16, 30),
+                    rows: 1,
+                    columns: 1,
+                    offset: (39, 170),
+                ),
+            ),
+            physics: [
+                (collider: Rectangle(x:2, y:20),
+                position: (0, 0)),
+            ],
+        ),
+        (
+            name: "Ammonition",
+            texture: "images/beams.png",
+            rotation: -1.5707963248,
+            atlas: (
+                layout: (
+                    size: (16, 30),
+                    rows: 1,
+                    columns: 1,
+                    offset: (39, 56),
+                ),
+            ),
+            physics: [
+                (collider: Rectangle(x:2, y:20),
+                position: (0, 0)),
+            ],
+        ),
+    ]),
+
+    "asteroid-sheets": AsteroidSpriteSheets([
+        (
+            name: "small",
+            texture: "images/asteroids.png",
+            atlas: (
+                texture_count: 9,
+                layout: (
+                    size: (26, 26),
+                    columns: 3,
+                    rows: 3,
+                    padding: (4, 8),
+                    offset: (8, 6),
+                ),
+            ),
+            physics: [
+                (collider: Circle(8),),
+            ],
+        ),
+        (
+            name: "small-red",
+            texture: "images/asteroids.png",
+            color: Srgba((red:1.0, green: 0.6, blue: 0.6, alpha: 1.0)),
+            atlas: (
+                texture_count: 9,
+                layout: (
+                    size: (26, 26),
+                    columns: 3,
+                    rows: 3,
+                    padding: (4, 8),
+                    offset: (8, 6),
+                ),
+            ),
+            physics: [
+                (collider: Circle(8),),
+            ],
+        ),
+        (
+            name: "medium",
+            texture: "images/asteroids.png",
+            atlas: (
+                texture_count: 9,
+                layout: (
+                    size: (40, 40),
+                    columns: 3,
+                    rows: 3,
+                    padding: (8, 8),
+                    offset: (8, 108),
+                ),
+            ),
+            physics: [
+                (collider: Circle(14),),
+            ],
+        ),
+        (
+            name: "big",
+            texture: "images/asteroids.png",
+            atlas: (
+                texture_count: 9,
+                layout: (
+                    size: (52, 52),
+                    columns: 3,
+                    rows: 3,
+                    padding: (12, 13),
+                    offset: (158, 8),
+                ),
+            ),
+            physics: [
+                (collider: Circle(20),),
+            ],
+        ),
+    ]),
+})
