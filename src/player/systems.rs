@@ -162,7 +162,7 @@ pub fn spawn_new_player(
     };
     let spritesheet = spritesheet_asset.spritesheet();
     let clamp_speed = ClampMovementSpeed::new(player_settings.speed_range.clone());
-    let equipped_weapon = EquippedWeapon::new(game_start_settings.weapon_idx);
+    let equipped_weapon = EquippedWeapon::new(game_start_settings.weapon_key.clone());
     let score = Score::new(0);
 
     commands
@@ -322,9 +322,9 @@ pub fn on_player_firing(
     mut projectile_events: EventWriter<SpawnProjectilesEvent>,
 ) {
     let player = trigger.entity();
-    let weapon_idx = **weapon_query.get(player).unwrap();
+    let weapon = (**weapon_query.get(player).unwrap()).clone();
     trace!(?player, "Firing");
-    projectile_events.send(SpawnProjectilesEvent { player, weapon_idx });
+    projectile_events.send(SpawnProjectilesEvent { player, weapon });
 }
 
 #[instrument(skip_all)]

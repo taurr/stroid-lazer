@@ -1,6 +1,5 @@
 ({
     "player-sheet": SpriteSheet((
-        name: "Spaceship",
         texture: "images/spiked ship 3.small.green.png",
         //anchor: Center,
         size: (75, 75),
@@ -55,7 +54,6 @@
     )),
 
     "flames-sheet": SpriteSheet((
-        name: "Rocket Flames",
         texture: "images/rocket_fire.png",
         size: (35, 50),
         anchor: TopCenter,
@@ -64,9 +62,8 @@
         color: Srgba((red:1,green:1,blue:1,alpha:0.66)),
     )),
 
-    "ammonition-sheets": AmmonitionSpriteSheets([
-        (
-            name: "Ammonition",
+    "ammonition-texture-collection": AmmonitionTextureCollection({
+        "red-ammonition-gfx": (
             texture: "images/beams.png",
             rotation: -1.5707963248,
             atlas: (
@@ -82,8 +79,7 @@
                 position: (0, 0)),
             ],
         ),
-        (
-            name: "Ammonition",
+        "green-ammonition-gfx": (
             texture: "images/beams.png",
             rotation: -1.5707963248,
             atlas: (
@@ -99,11 +95,10 @@
                 position: (0, 0)),
             ],
         ),
-    ]),
+    }),
 
-    "asteroid-sheets": AsteroidSpriteSheets([
-        (
-            name: "small",
+    "asteroid-texture-collection": AsteroidTextureCollection({
+        "small-asteroid-atlas": (
             texture: "images/asteroids.png",
             atlas: (
                 texture_count: 9,
@@ -119,8 +114,7 @@
                 (collider: Circle(8),),
             ],
         ),
-        (
-            name: "small-red",
+        "small-red-asteroid-atlas": (
             texture: "images/asteroids.png",
             color: Srgba((red:1.0, green: 0.6, blue: 0.6, alpha: 1.0)),
             atlas: (
@@ -137,8 +131,7 @@
                 (collider: Circle(8),),
             ],
         ),
-        (
-            name: "medium",
+        "medium-asteroid-atlas": (
             texture: "images/asteroids.png",
             atlas: (
                 texture_count: 9,
@@ -154,8 +147,7 @@
                 (collider: Circle(14),),
             ],
         ),
-        (
-            name: "big",
+        "big-asteroid-atlas": (
             texture: "images/asteroids.png",
             atlas: (
                 texture_count: 9,
@@ -171,5 +163,5 @@
                 (collider: Circle(20),),
             ],
         ),
-    ]),
+    }),
 })

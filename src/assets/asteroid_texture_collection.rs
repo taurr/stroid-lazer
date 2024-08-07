@@ -1,23 +1,26 @@
+use std::collections::BTreeMap;
+
 use bevy::prelude::*;
 use derive_more::{Constructor, Deref, DerefMut};
 
 use crate::assets::SpriteSheetAsset;
 
 use super::game_assets::GameAssets;
+//use super::optional;
 
 /// Loaded as part of the [crate::assets::AsteroidAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Reflect, Debug, Clone, Deref, DerefMut, Constructor)]
-pub struct AmmonitionSpriteSheets(Vec<SpriteSheetAsset>);
+pub struct AsteroidTextureCollection(BTreeMap<String, SpriteSheetAsset>);
 
-impl FromWorld for AmmonitionSpriteSheets {
+impl FromWorld for AsteroidTextureCollection {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<GameAssets>();
         let asset = world
-            .resource::<Assets<AmmonitionSpriteSheets>>()
-            .get(assets.ammonition_spritesheet.id())
+            .resource::<Assets<AsteroidTextureCollection>>()
+            .get(assets.asteroid_texture_collection_handle.id())
             .unwrap()
             .clone();
-        debug!(ammonition_sprites = asset.len());
+        debug!(asteroid_sprites = asset.len());
         asset
     }
 }

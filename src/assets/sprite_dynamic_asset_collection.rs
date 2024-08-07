@@ -1,5 +1,7 @@
 //! Here we define the syntax for loading [SpriteSheetAsset]s dynamically, using the [SpriteDynamicAssetCollection].
 //!
+use std::collections::BTreeMap;
+
 use avian2d::prelude::{Friction, Restitution};
 use bevy::{
     ecs::system::SystemState,
@@ -10,7 +12,7 @@ use bevy::{
 use bevy_asset_loader::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::{optional, AmmonitionSpriteSheets, AsteroidSpriteSheets, SpriteSheetAsset};
+use super::{optional, AmmonitionTextureCollection, AsteroidTextureCollection, SpriteSheetAsset};
 
 #[derive(Asset, TypePath, Deserialize, Debug, Default, Clone)]
 pub struct SpriteDynamicAssetCollection(HashMap<String, SpriteDynamicAsset>);
@@ -32,8 +34,8 @@ enum SpriteDynamicAsset {
         path: String,
     },
     SpriteSheet(SpriteSheet),
-    AsteroidSpriteSheets(Vec<SpriteSheet>),
-    AmmonitionSpriteSheets(Vec<SpriteSheet>),
+    AsteroidTextureCollection(BTreeMap<String, SpriteSheet>),
+    AmmonitionTextureCollection(BTreeMap<String, SpriteSheet>),
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Reflect, PartialEq)]
@@ -229,10 +231,12 @@ impl DynamicAsset for SpriteDynamicAsset {
                 vec![asset_server.load_untyped(texture).untyped()]
             }
 
-            SpriteDynamicAsset::AsteroidSpriteSheets(sprite_sheets)
-            | SpriteDynamicAsset::AmmonitionSpriteSheets(sprite_sheets) => sprite_sheets
+            SpriteDynamicAsset::AsteroidTextureCollection(sprite_sheets)
+            | SpriteDynamicAsset::AmmonitionTextureCollection(sprite_sheets) => sprite_sheets
                 .iter()
-                .map(|SpriteSheet { texture, .. }| asset_server.load_untyped(texture).untyped())
+                .map(|(_, SpriteSheet { texture, .. })| {
+                    asset_server.load_untyped(texture).untyped()
+                })
                 .collect(),
         }
     }
@@ -248,23 +252,24 @@ impl DynamicAsset for SpriteDynamicAsset {
             }
 
             SpriteDynamicAsset::SpriteSheet(spritesheet) => {
-                let typed_asset = self.build_spritesheet_asset(spritesheet, world);
+                let typed_asset = self.build_spritesheet_asset(None, spritesheet, world);
                 let untyped_asset = self.add_asset(world, typed_asset);
                 Ok(DynamicAssetType::Single(untyped_asset))
             }
 
-            SpriteDynamicAsset::AsteroidSpriteSheets(spritesheets) => {
-                let spritesheets = self.build_spritesheet_vec(spritesheets, world);
-                Ok(DynamicAssetType::Single(
-                    self.add_asset(world, AsteroidSpriteSheets::new(spritesheets)),
-                ))
-            }
-
-            SpriteDynamicAsset::AmmonitionSpriteSheets(spritesheets) => {
+            SpriteDynamicAsset::AsteroidTextureCollection(spritesheets) => {
                 let spritesheets = self.build_spritesheet_vec(spritesheets, world);
                 Ok(DynamicAssetType::Single(self.add_asset(
                     world,
-                    AmmonitionSpriteSheets::new(spritesheets),
+                    AsteroidTextureCollection::new(spritesheets),
+                )))
+            }
+
+            SpriteDynamicAsset::AmmonitionTextureCollection(spritesheets) => {
+                let spritesheets = self.build_spritesheet_vec(spritesheets, world);
+                Ok(DynamicAssetType::Single(self.add_asset(
+                    world,
+                    AmmonitionTextureCollection::new(spritesheets),
                 )))
             }
         }
@@ -281,17 +286,23 @@ impl SpriteDynamicAsset {
 
     fn build_spritesheet_vec(
         &self,
-        spritesheets: &[SpriteSheet],
+        spritesheets: &BTreeMap<String, SpriteSheet>,
         world: &mut World,
-    ) -> Vec<SpriteSheetAsset> {
+    ) -> BTreeMap<String, SpriteSheetAsset> {
         spritesheets
             .iter()
-            .map(|spritesheet| self.build_spritesheet_asset(spritesheet, world))
+            .map(|(key, spritesheet)| {
+                (
+                    key.clone(),
+                    self.build_spritesheet_asset(Some(key), spritesheet, world),
+                )
+            })
             .collect()
     }
 
     fn build_spritesheet_asset(
         &self,
+        key: Option<&str>,
         spritesheet: &SpriteSheet,
         world: &mut World,
     ) -> SpriteSheetAsset {
@@ -331,7 +342,10 @@ impl SpriteDynamicAsset {
         };
 
         crate::assets::SpriteSheetAsset {
-            name: spritesheet.name.clone(),
+            name: spritesheet
+                .name
+                .clone()
+                .or_else(|| key.map(|key| key.to_string())),
             texture: texture_handle,
             texture_count,
             anchor: match spritesheet.anchor {

@@ -1,18 +1,18 @@
-([
-    (
-        spritesheet_idx: 0,
+({
+    "red-laser": (
+        texture_key: "red-ammonition-gfx",
         speed: 1000.0,
         timeout: (
             secs: 0,
             nanos: 650000000,
         ),
     ),
-    (
-        spritesheet_idx: 1,
+    "green-fast-laser": (
+        texture_key: "green-ammonition-gfx",
         speed: 2000.0,
         timeout: (
             secs: 1,
             nanos: 500000000,
         ),
     ),
-])
+})

@@ -4,9 +4,9 @@ use bevy_asset_loader::prelude::*;
 use crate::assets::{GameSettings, SpriteSheetAsset};
 
 use super::{
-    ammonition_settings::AmmonitionDepot, asteroid_pool_settings::AsteroidPoolCollection,
-    asteroid_spritesheets::AsteroidSpriteSheets, input_key_settings::InputKeySettings,
-    weapon_settings::WeaponCollection, AmmonitionSpriteSheets, GameLevelSettingsCollection,
+    ammonition_depot::AmmonitionDepot, asteroid_pool_collection::AsteroidPoolCollection,
+    asteroid_texture_collection::AsteroidTextureCollection, input_key_settings::InputKeySettings,
+    weapon_collection::WeaponCollection, AmmonitionTextureCollection, GameLevelSettingsCollection,
 };
 
 /// Loaded directly as a [Resource] by [bevy_asset_loader].
@@ -24,33 +24,33 @@ pub struct GameAssets {
     pub input_keys: Handle<InputKeySettings>,
 
     /// The content of this asset can be found as a [Resource].
-    #[asset(key = "weapon-settings")]
+    #[asset(key = "weapon-collection")]
     pub weapon_settings: Handle<WeaponCollection>,
 
     /// The content of this asset can be found as a [Resource].
-    #[asset(key = "ammonition-settings")]
+    #[asset(key = "ammonition-depot")]
     pub ammonition_settings: Handle<AmmonitionDepot>,
 
     /// The content of this asset can be found as a [Resource].
-    #[asset(key = "asteroid-settings")]
+    #[asset(key = "asteroid-pool-collection")]
     pub asteroid_pool_settings: Handle<AsteroidPoolCollection>,
 
     /****************
      * spritesheets *
      ****************/
     #[asset(key = "player-sheet")]
-    pub player_spritesheet: Handle<SpriteSheetAsset>,
+    pub player_spritesheet_handle: Handle<SpriteSheetAsset>,
 
     #[asset(key = "flames-sheet")]
-    pub flames_spritesheet: Handle<SpriteSheetAsset>,
+    pub flames_spritesheet_handle: Handle<SpriteSheetAsset>,
 
     /// The content of this asset can be found as a [Resource].
-    #[asset(key = "ammonition-sheets")]
-    pub ammonition_spritesheet: Handle<AmmonitionSpriteSheets>,
+    #[asset(key = "ammonition-texture-collection")]
+    pub ammonition_texture_collection_handle: Handle<AmmonitionTextureCollection>,
 
     /// The content of this asset can be found as a [Resource].
-    #[asset(key = "asteroid-sheets")]
-    pub asteroid_spritesheets: Handle<AsteroidSpriteSheets>,
+    #[asset(key = "asteroid-texture-collection")]
+    pub asteroid_texture_collection_handle: Handle<AsteroidTextureCollection>,
 }
 
 #[derive(SystemParam)]
@@ -62,7 +62,7 @@ pub struct PlayerSpriteSheet<'w> {
 impl<'w> PlayerSpriteSheet<'w> {
     pub fn spritesheet(&self) -> &SpriteSheetAsset {
         self.spritesheet_assets
-            .get(self.game_assets.player_spritesheet.id())
+            .get(self.game_assets.player_spritesheet_handle.id())
             .unwrap()
     }
 }
@@ -76,7 +76,7 @@ pub struct FlameSpriteSheet<'w> {
 impl<'w> FlameSpriteSheet<'w> {
     pub fn spritesheet(&self) -> &SpriteSheetAsset {
         self.spritesheet_assets
-            .get(self.game_assets.flames_spritesheet.id())
+            .get(self.game_assets.flames_spritesheet_handle.id())
             .unwrap()
     }
 }

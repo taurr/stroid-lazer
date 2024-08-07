@@ -5,7 +5,7 @@ use tracing::instrument;
 
 use crate::{
     assets::{
-        AmmonitionDepot, AmmonitionIndex, AmmonitionSpriteSheets, EntityCommandsExt,
+        AmmonitionDepot, AmmonitionSelection, AmmonitionTextureCollection, EntityCommandsExt,
         WeaponCollection,
     },
     movement::Wrapping,
@@ -33,9 +33,10 @@ pub fn spawn_projectiles(
     mut commands: Commands,
     mut player_query: Query<(&Transform, &Rotation, &mut RngComponent), With<Player>>,
     weapon_collection: Res<WeaponCollection>,
+    ammonition_depot: Res<AmmonitionDepot>,
 ) {
-    for SpawnProjectilesEvent { player, weapon_idx } in ev_spawn.read() {
-        let weapon_info = &weapon_collection[*weapon_idx];
+    for SpawnProjectilesEvent { player, weapon } in ev_spawn.read() {
+        let weapon_info = &weapon_collection[weapon];
 
         let (player_transform, player_rotation, mut rand) = player_query.get_mut(*player).unwrap();
 
@@ -46,14 +47,14 @@ pub fn spawn_projectiles(
                     .extend(player_transform.translation.z)
             };
 
-            let ammonition_idx =
-                pick_random_ammonition_index(&mut rand, &weapon_info.ammonition_idx);
+            let ammonition =
+                pick_random_ammonition_index(&mut rand, &weapon_info.ammonition, &ammonition_depot);
             commands.trigger_targets(
                 SpawnSingleProjectileEvent {
                     state: GameState::Playing,
                     position: port_position,
                     direction: *player_rotation,
-                    ammonition_idx,
+                    ammonition,
                 },
                 *player,
             );
@@ -63,14 +64,15 @@ pub fn spawn_projectiles(
 
 fn pick_random_ammonition_index(
     rand: &mut RngComponent,
-    ammonition_selection: impl AsRef<[AmmonitionIndex]>,
-) -> usize {
+    ammonition_selection: impl AsRef<[AmmonitionSelection]>,
+    ammonition_depot: &AmmonitionDepot,
+) -> String {
     let slice = ammonition_selection.as_ref();
     let weight_sum = slice
         .iter()
         .map(|s| match s {
-            AmmonitionIndex::Exact { weight, .. } => weight,
-            AmmonitionIndex::Range { weight, .. } => weight,
+            AmmonitionSelection::Exact { weight, .. } => weight,
+            AmmonitionSelection::IndexRange { weight, .. } => weight,
         })
         .sum();
     let random = rand.f32_range(0.0..weight_sum);
@@ -81,8 +83,8 @@ fn pick_random_ammonition_index(
             .iter()
             .find(|s| {
                 let weight = match s {
-                    AmmonitionIndex::Exact { weight, .. } => weight,
-                    AmmonitionIndex::Range { weight, .. } => weight,
+                    AmmonitionSelection::Exact { weight, .. } => weight,
+                    AmmonitionSelection::IndexRange { weight, .. } => weight,
                 };
                 w += weight;
                 random < w
@@ -91,8 +93,16 @@ fn pick_random_ammonition_index(
     };
 
     match selection {
-        AmmonitionIndex::Exact { index, .. } => *index,
-        AmmonitionIndex::Range { start, end, .. } => rand.usize(*start..*end),
+        AmmonitionSelection::Exact { name, .. } => name.clone(),
+        AmmonitionSelection::IndexRange {
+            start_index,
+            end_index,
+            ..
+        } => ammonition_depot
+            .iter()
+            .nth(rand.usize(*start_index..*end_index))
+            .map(|(name, _)| name.clone())
+            .unwrap(),
     }
 }
 
@@ -101,14 +111,14 @@ pub fn on_projectile_spawn(
     trigger: Trigger<SpawnSingleProjectileEvent>,
     playing_field: Query<Entity, With<PlayingField>>,
     ammonition_depot: Res<AmmonitionDepot>,
-    ammonition_spritesheets: Res<AmmonitionSpriteSheets>,
+    ammonition_spritesheets: Res<AmmonitionTextureCollection>,
     mut commands: Commands,
 ) {
     let event = trigger.event();
     let playing_field = playing_field.single();
 
-    let ammonition_info = &ammonition_depot[event.ammonition_idx];
-    let ammonitio_gfx = &ammonition_spritesheets[ammonition_info.spritesheet_idx];
+    let ammonition_info = &ammonition_depot[&event.ammonition];
+    let ammonitio_gfx = &ammonition_spritesheets[ammonition_info.texture_key.as_str()];
 
     let direction = event.direction;
     let velocity = LinearVelocity(direction * Vec2::X * ammonition_info.speed);

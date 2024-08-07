@@ -9,6 +9,7 @@ use crate::assets::{ColliderType, Physics};
 /// The purpose of this [Asset] is to define a complete [SpriteBundle] and easily insert it for an entity.
 #[derive(Asset, Reflect, Debug, Clone)]
 pub struct SpriteSheetAsset {
+    /// Optional name, used for for a name component on the Entity with a SpriteBundle
     pub name: Option<String>,
 
     pub texture: Handle<Image>,

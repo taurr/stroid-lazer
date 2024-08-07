@@ -1,0 +1,85 @@
+({
+    "final-asteroid-pool": (
+        textures: [
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 0),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 1),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 2),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 3),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 4),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 5),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 6),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 7),
+            AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 8),
+        ],
+        speed: Range(start: 50, end: 70),
+        displacement: Exact(10),
+        rotation: Range(start: -2.0, end: 2.0),
+        hit_behavior: Points(25),
+    ),
+    "trick-final-asteroid-pool": (
+        textures: [
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 0),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 1),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 2),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 3),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 4),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 5),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 6),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 7),
+            AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 8),
+        ],
+        speed: Exact(50),
+        displacement: None,
+        rotation: Range(start: -1.5, end: 1.5),
+        hit_behavior: PointsAndSplit(
+            points: 33,
+            count: Exact(1),
+            select_from: [ Pool(key: "final-asteroid-pool") ]
+        ),
+    ),
+    "mid-asteroid-pool": (
+        textures: [
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 0),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 1),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 2),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 3),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 4),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 5),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 6),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 7),
+            AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 8),
+        ],
+        speed: Range(start: 40, end: 60),
+        displacement: Range(start: 20, end: 40),
+        rotation: Range(start: -1.0, end: 1.0),
+        hit_behavior: PointsAndSplit(
+            points: 20,
+            count: Exact(3),
+            select_from: [
+                Pool(key: "final-asteroid-pool", weight: 0.8),
+                Pool(key: "trick-final-asteroid-pool", weight: 0.2),
+            ]
+        ),
+    ),
+    "starter-asteroid-pool": (
+        textures: [
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 0),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 1),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 2),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 3),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 4),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 5),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 6),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 7),
+            AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 8),
+        ],
+        speed: Range(start: 30, end: 50),
+        displacement: Range(start: 30, end: 70),
+        rotation: Range(start: -1.0, end: 1.0),
+        hit_behavior: PointsAndSplit(
+            points: 15,
+            count: Range(start: 2, end: 4),
+            select_from: [ Pool(key: "mid-asteroid-pool") ]
+        ),
+    ),
+})

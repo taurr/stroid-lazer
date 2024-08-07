@@ -1,0 +1,19 @@
+({
+    "1-port-red-laser": (
+        weapon_ports: [
+            (20, 50), (-20, 50),
+        ],
+        ammonition: [
+            Exact(name: "red-laser"),
+        ],
+    ),
+    "2-port-red-laser, random green-fast": (
+        weapon_ports: [
+            (0, 20),
+        ],
+        ammonition: [
+            Exact(name: "red-laser", weight: 0.8),
+            Exact(name: "green-fast-laser", weight: 0.2 ),
+        ],
+    ),
+})

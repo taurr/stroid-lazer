@@ -1,4 +1,5 @@
 use core::time::Duration;
+use std::collections::BTreeMap;
 
 use bevy::prelude::*;
 use derive_more::{Deref, DerefMut};
@@ -9,7 +10,7 @@ use super::game_assets::GameAssets;
 
 /// Loaded as part of the [GameAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]
-pub struct AmmonitionDepot(Vec<AmmonitionInfo>);
+pub struct AmmonitionDepot(BTreeMap<String, AmmonitionInfo>);
 
 impl FromWorld for AmmonitionDepot {
     fn from_world(world: &mut World) -> Self {
@@ -24,7 +25,7 @@ impl FromWorld for AmmonitionDepot {
 
 #[derive(Reflect, Deserialize, Debug, Clone)]
 pub struct AmmonitionInfo {
-    pub spritesheet_idx: usize,
+    pub texture_key: String,
     pub speed: f32,
     pub timeout: Duration,
 }

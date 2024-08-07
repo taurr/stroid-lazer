@@ -33,11 +33,7 @@ use self::{
 struct PlayingField;
 
 #[derive(Resource, Debug, Default, Clone, Deref, DerefMut)]
-pub struct GameLevel {
-    #[deref]
-    #[deref_mut]
-    pub current: String,
-}
+pub struct GameLevel(String);
 
 #[derive(PhysicsLayer)]
 pub enum CollisionLayer {
@@ -86,14 +82,6 @@ fn main() -> AppExit {
 fn add_features(app: &mut App) {
     #[cfg(feature = "cmd_line")]
     app.insert_resource(<args::Args as clap::Parser>::parse());
-
-    app.add_systems(
-        Last,
-        (
-            bevy::dev_tools::states::log_transitions::<GameState>,
-            bevy::dev_tools::states::log_transitions::<PlayState>,
-        ),
-    );
 
     #[cfg(feature = "inspector")]
     app.add_plugins((

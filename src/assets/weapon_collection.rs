@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use bevy::prelude::*;
 use derive_more::{Deref, DerefMut};
 use serde::Deserialize;
@@ -7,7 +9,7 @@ use super::game_assets::GameAssets;
 
 /// Loaded as part of the [crate::assets::GameAssets] collection, then inserted as a resource.
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]
-pub struct WeaponCollection(Vec<WeaponInfo>);
+pub struct WeaponCollection(BTreeMap<String, WeaponInfo>);
 
 impl FromWorld for WeaponCollection {
     fn from_world(world: &mut World) -> Self {
@@ -22,26 +24,26 @@ impl FromWorld for WeaponCollection {
 
 #[derive(Reflect, Deserialize, Debug, Clone)]
 pub struct WeaponInfo {
-    pub ammonition_idx: Vec<AmmonitionIndex>,
+    pub ammonition: Vec<AmmonitionSelection>,
     pub weapon_ports: Vec<Vec2>,
 }
 
-#[derive(Deserialize, Debug, Reflect, Clone, Copy)]
-pub enum AmmonitionIndex {
+#[derive(Deserialize, Debug, Reflect, Clone)]
+pub enum AmmonitionSelection {
     Exact {
-        index: usize,
-        #[serde(default = "AmmonitionIndex::default_weight")]
+        name: String,
+        #[serde(default = "AmmonitionSelection::default_weight")]
         weight: f32,
     },
-    Range {
-        start: usize,
-        end: usize,
-        #[serde(default = "AmmonitionIndex::default_weight")]
+    IndexRange {
+        start_index: usize,
+        end_index: usize,
+        #[serde(default = "AmmonitionSelection::default_weight")]
         weight: f32,
     },
 }
 
-impl AmmonitionIndex {
+impl AmmonitionSelection {
     fn default_weight() -> f32 {
         1.0
     }

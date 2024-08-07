@@ -9,7 +9,7 @@ use crate::{
     assets::{
         AsteroidDisplacement, AsteroidHitBehavior, AsteroidPool, AsteroidPoolCollection,
         AsteroidSpeedRange, AsteroidSplitCount, AsteroidSplitSelectionExt,
-        AsteroidSpriteSheetSelection, AsteroidSpriteSheets, EntityCommandsExt, GameAreaSettings,
+        AsteroidTextureCollection, AsteroidTextureSelection, EntityCommandsExt, GameAreaSettings,
         GameLevelSettings, PlayerSettings,
     },
     constants::ASTEROID_Z_RANGE,
@@ -48,7 +48,7 @@ pub fn spawn_level_asteroids(
     level_settings: Res<GameLevelSettings>,
     game_area_settings: Res<GameAreaSettings>,
     asteroid_pool_collection: Res<AsteroidPoolCollection>,
-    asteroid_spritesheets: Res<AsteroidSpriteSheets>,
+    asteroid_spritesheets: Res<AsteroidTextureCollection>,
     playstate: Res<State<PlayState>>,
 ) {
     let (playing_field, mut rand) = playing_field.single_mut();
@@ -108,7 +108,7 @@ pub fn spawn_debug_asteroids(
     mut commands: Commands,
     game_area_settings: Res<GameAreaSettings>,
     asteroid_pool_collection: Res<AsteroidPoolCollection>,
-    asteroid_spritesheets: Res<AsteroidSpriteSheets>,
+    asteroid_spritesheets: Res<AsteroidTextureCollection>,
 ) {
     let (playing_field, mut rand) = playing_field.single_mut();
 
@@ -266,7 +266,7 @@ pub fn on_asteroid_hit(
     mut playing_field: Query<(Entity, &mut RngComponent), With<PlayingField>>,
     mut hit_behavior_query: Query<&AsteroidHitBehavior>,
     asteroid_pool_collection: Res<AsteroidPoolCollection>,
-    asteroid_spritesheets: Res<AsteroidSpriteSheets>,
+    asteroid_spritesheets: Res<AsteroidTextureCollection>,
     mut score_events: EventWriter<AddToScoreEvent>,
     mut remove_events: EventWriter<AsteroidRemoveEvent>,
     mut commands: Commands,
@@ -352,30 +352,28 @@ fn spawn_asteroid_from_pool(
     parent_entity: Entity,
     position: Vec3,
     pool: &AsteroidPool,
+    // Inside the pool, which spritesheet index should be used
     pool_sheet_index: Option<usize>,
-    asteroid_spritesheets: &AsteroidSpriteSheets,
+    asteroid_spritesheets: &AsteroidTextureCollection,
     rand: &mut RngComponent,
     commands: &mut Commands,
 ) {
     let (spritesheet, atlas_index, speed_range, rotation_range) = {
         let pool_sheet_index =
-            pool_sheet_index.unwrap_or_else(|| rand.usize(0..pool.spritesheets.len()));
-        let Some(spritesheet_selection) = pool.spritesheets.get(pool_sheet_index) else {
+            pool_sheet_index.unwrap_or_else(|| rand.usize(0..pool.textures.len()));
+        let Some(texture_selection) = pool.textures.get(pool_sheet_index) else {
             warn!(pool_sheet_index, "Could not find sprite sheet");
             return;
         };
-        match spritesheet_selection {
-            AsteroidSpriteSheetSelection::AtlasIndex {
-                sheetname: sheet,
-                index,
+        match texture_selection {
+            AsteroidTextureSelection::AtlasIndex {
+                key: spritesheet_key,
+                atlas_idx: index,
                 speed,
                 rotation,
             } => {
-                let Some(spritesheet) = asteroid_spritesheets
-                    .iter()
-                    .find(|&s| s.name.as_ref() == Some(sheet))
-                else {
-                    warn!(sheet, "Could not find sprite sheet");
+                let Some(spritesheet) = asteroid_spritesheets.get(spritesheet_key) else {
+                    warn!(spritesheet_key, "Could not find sprite sheet");
                     return;
                 };
                 let index = index.unwrap_or(spritesheet.atlas_index);

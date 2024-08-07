@@ -1,14 +1,15 @@
-use bevy::{prelude::*, utils::HashMap};
+use std::collections::BTreeMap;
+
+use bevy::prelude::*;
 use derive_more::{Deref, DerefMut};
 use serde::Deserialize;
 
 use super::optional;
-use super::{game_assets::GameAssets, AsteroidSplitSelection};
+use super::{game_assets::GameAssets, AsteroidSelection};
 
 /// Loaded as part of the [crate::assets::AsteroidAssets] collection, then inserted as a [Resource].
-/// TODO: make inner a HashMap, then remove name from spritesheet
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]
-pub struct AsteroidPoolCollection(HashMap<String, AsteroidPool>);
+pub struct AsteroidPoolCollection(BTreeMap<String, AsteroidPool>);
 
 impl FromWorld for AsteroidPoolCollection {
     fn from_world(world: &mut World) -> Self {
@@ -24,7 +25,7 @@ impl FromWorld for AsteroidPoolCollection {
 #[derive(Reflect, Deserialize, Debug, Clone)]
 pub struct AsteroidPool {
     /// spritesheets to choose from when spawning from this pool
-    pub spritesheets: Vec<AsteroidSpriteSheetSelection>,
+    pub textures: Vec<AsteroidTextureSelection>,
     /// default range to find the asteroid speed within
     pub speed: AsteroidSpeedRange,
     /// how far to displace the asteroid position when spawning as a result of being shot!
@@ -36,13 +37,13 @@ pub struct AsteroidPool {
 }
 
 #[derive(Deserialize, Debug, Reflect, Clone)]
-pub enum AsteroidSpriteSheetSelection {
+pub enum AsteroidTextureSelection {
     AtlasIndex {
-        /// sprite sheet name
-        sheetname: String,
+        /// sprite sheet key in the [AsteroidTextureCollection](super::asteroid_texture_collection::AsteroidTextureCollection)
+        key: String,
         /// index of sprite if in an atlas
         #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
-        index: Option<usize>,
+        atlas_idx: Option<usize>,
         /// range to find the asteroid speed within (overrides setting of the pool)
         #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
         speed: Option<AsteroidSpeedRange>,
@@ -59,7 +60,7 @@ pub enum AsteroidHitBehavior {
     PointsAndSplit {
         points: usize,
         count: AsteroidSplitCount,
-        select_from: Vec<AsteroidSplitSelection>,
+        select_from: Vec<AsteroidSelection>,
     },
 }
 

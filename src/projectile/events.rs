@@ -6,7 +6,7 @@ use crate::states::GameState;
 #[derive(Event)]
 pub struct SpawnProjectilesEvent {
     pub player: Entity,
-    pub weapon_idx: usize,
+    pub weapon: String,
 }
 
 #[derive(Event)]
@@ -14,7 +14,7 @@ pub struct SpawnSingleProjectileEvent {
     pub state: GameState,
     pub position: Vec3,
     pub direction: Rotation,
-    pub ammonition_idx: usize,
+    pub ammonition: String,
 }
 
 #[allow(unused)]

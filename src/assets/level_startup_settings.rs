@@ -1,10 +1,7 @@
-
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use super::{
-    AsteroidSplitCount, AsteroidSplitSelection,
-};
+use super::{AsteroidSelection, AsteroidSplitCount};
 #[derive(Resource, Deserialize, Reflect, Debug, Clone)]
 pub struct LevelStartupSettings {
     pub asteroids: LevelAsteroidStartupSettings,
@@ -13,5 +10,5 @@ pub struct LevelStartupSettings {
 #[derive(Resource, Deserialize, Reflect, Debug, Clone)]
 pub struct LevelAsteroidStartupSettings {
     pub count: AsteroidSplitCount,
-    pub select_from: Vec<AsteroidSplitSelection>,
+    pub select_from: Vec<AsteroidSelection>,
 }

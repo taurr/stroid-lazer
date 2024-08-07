@@ -10,7 +10,7 @@ use super::{game_assets::GameAssets, GameSettings};
 pub struct GameStartSettings {
     pub lives: usize,
     pub level: String,
-    pub weapon_idx: usize,
+    pub weapon_key: String,
     pub countdown_duration: Duration,
     pub minimum_countdown_duration: Duration,
 }

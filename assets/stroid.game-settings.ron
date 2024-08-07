@@ -2,7 +2,7 @@
     game_start: (
         lives: 3,
         level: "Training Wheels",
-        weapon_idx: 1,
+        weapon_key: "1-port-red-laser",
         // TODO: move to a GeneralSettings section
         minimum_countdown_duration: (
             secs: 1,

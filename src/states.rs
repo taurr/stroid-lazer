@@ -20,6 +20,7 @@ use crate::{
     GameLevel, PlayingField,
 };
 
+/// General states of the game.
 #[derive(States, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum GameState {
     #[default]
@@ -30,6 +31,7 @@ pub enum GameState {
     Playing,
 }
 
+/// States during actual gameplay ([GameState::Playing]).
 #[derive(SubStates, Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 #[source(GameState = GameState::Playing)]
 pub enum PlayState {
@@ -59,10 +61,17 @@ impl Plugin for GameStatesPlugin {
         app.init_state::<GameState>()
             .add_sub_state::<PlayState>()
             .enable_state_scoped_entities::<GameState>()
-            .enable_state_scoped_entities::<PlayState>();
+            .enable_state_scoped_entities::<PlayState>()
+            .add_systems(
+                Last,
+                (
+                    bevy::dev_tools::states::log_transitions::<GameState>,
+                    bevy::dev_tools::states::log_transitions::<PlayState>,
+                ),
+            );
 
         // add the loading state for the game - done here as we need to configure where it goes
-        // onece assets are loaded.
+        // once assets has been loaded.
         app.add_loading_state(
             #[cfg(feature = "dbg_colliders")]
             LoadingState::new(GameState::LoadingAssets)
@@ -126,9 +135,12 @@ impl Plugin for GameStatesPlugin {
     }
 }
 
+/// Component added to entities that we've pause automatically when leaving the [PlayState::Running] state.
 #[derive(Component, Reflect, Debug, Clone)]
 struct MovementAutoPaused;
 
+/// Pauses all movement and rotation by temporarily inserting a [MovementPaused] component,
+/// and adding the [MovementAutoPaused] component.
 fn pause_movement(
     query: Query<
         Entity,
@@ -145,16 +157,6 @@ fn pause_movement(
             .entity(entity)
             .insert(MovementPaused)
             .insert(MovementAutoPaused);
-    }
-}
-
-fn resume_movement(query: Query<Entity, With<MovementAutoPaused>>, mut commands: Commands) {
-    for entity in query.iter() {
-        debug!(?entity, "resuming movement");
-        commands
-            .entity(entity)
-            .remove::<MovementPaused>()
-            .remove::<MovementAutoPaused>();
     }
 }
 
@@ -261,6 +263,23 @@ fn setup_camera_and_playing_field(
     commands.spawn(iyes_perf_ui::prelude::PerfUiCompleteBundle::default());
 }
 
+/// Resumes movement and rotation from all [Entity]s that have the [MovementAutoPaused] component by
+/// removing the [MovementPaused] and [MovementAutoPaused] components.
+fn resume_movement(query: Query<Entity, With<MovementAutoPaused>>, mut commands: Commands) {
+    for entity in query.iter() {
+        debug!(?entity, "resuming movement");
+        commands
+            .entity(entity)
+            .remove::<MovementPaused>()
+            .remove::<MovementAutoPaused>();
+    }
+}
+
+/// Reads the current level from the [GameLevel] resource and looks up the [GameLevelSettings] to
+/// insert it, and a [PlayerSettings] as resources.
+///
+/// This wastes a little bit of memory, but saves us from looking up and merging settings every
+/// time we need them during the gameplay.
 #[instrument(skip_all)]
 pub fn init_level_settings(
     current_level: Res<GameLevel>,
@@ -287,6 +306,7 @@ pub fn init_level_settings(
     commands.insert_resource(level_settings.clone());
 }
 
+/// Initialize [GameLevel] to the correct starting level.
 #[cfg(feature = "cmd_line")]
 #[instrument(skip_all)]
 fn start_new_game(
@@ -305,6 +325,7 @@ fn start_new_game(
     next.set(PlayState::CountdownBeforeRunning);
 }
 
+/// Initialize [GameLevel] to the correct starting level.
 #[cfg(not(feature = "cmd_line"))]
 #[instrument(skip_all)]
 fn start_new_game(
@@ -317,18 +338,22 @@ fn start_new_game(
     next.set(PlayState::CountdownBeforeRunning);
 }
 
+/// Currently, just go directly to the countdown state.
 #[instrument(skip_all)]
 fn start_after_death(mut next: ResMut<NextState<PlayState>>) {
     info!("restarting after death");
     next.set(PlayState::CountdownBeforeRunning);
 }
 
+/// Currently, just go directly to the countdown state.
 #[instrument(skip_all)]
 fn start_next_level(mut next: ResMut<NextState<PlayState>>) {
     info!("starting next level");
     next.set(PlayState::CountdownBeforeRunning);
 }
 
+/// Detects when all asteroids have been destroyed, and all projectiles are gone, then transitions
+/// to either [PlayState::GameOver] or [PlayState::StartNextLevel] depending on the current level.
 #[instrument(skip_all)]
 fn detect_level_cleared(
     asteroid_counter: Res<AsteroidCount>,
@@ -358,6 +383,7 @@ fn detect_level_cleared(
     }
 }
 
+/// Whenever the primary window looses focus, transitions to [PlayState::Paused].
 fn pause_when_window_looses_focus(
     query: Query<&Window, With<PrimaryWindow>>,
     state: Res<State<PlayState>>,

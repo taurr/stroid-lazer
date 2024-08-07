@@ -8,7 +8,7 @@
             asteroids: (
                 count: Exact(5),
                 select_from: [
-                    Pool(name: "starter-asteroid-pool"),
+                    Pool(key: "starter-asteroid-pool"),
                 ],
             ),
         ),
@@ -19,8 +19,8 @@
             asteroids: (
                 count: Exact(7),
                 select_from: [
-                    Pool(name: "starter-asteroid-pool", weight: 0.8),
-                    Pool(name: "mid-asteroid-pool", weight: 0.2),
+                    Pool(key: "starter-asteroid-pool", weight: 0.8),
+                    Pool(key: "mid-asteroid-pool", weight: 0.2),
                 ],
             ),
         ),
@@ -31,9 +31,9 @@
             asteroids: (
                 count: Exact(10),
                 select_from: [
-                    Pool(name: "starter-asteroid-pool", weight: 0.7),
-                    Pool(name: "mid-asteroid-pool", weight: 0.2),
-                    Pool(name: "trick-final-asteroid-pool", weight: 0.1),
+                    Pool(key: "starter-asteroid-pool", weight: 0.7),
+                    Pool(key: "mid-asteroid-pool", weight: 0.2),
+                    Pool(key: "trick-final-asteroid-pool", weight: 0.1),
                 ],
             ),
         ),

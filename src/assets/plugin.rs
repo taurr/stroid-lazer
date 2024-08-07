@@ -6,9 +6,10 @@ use crate::states::GameState;
 
 use super::{
     game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
-    AmmonitionDepot, AmmonitionSpriteSheets, AsteroidPoolCollection, AsteroidSpriteSheets,
-    DefaultLevelSettings, GameAreaSettings, GameLevelSettingsCollection, GameSettings,
-    GameStartSettings, InputKeySettings, SpriteSheetAsset, TextureCount, WeaponCollection,
+    AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
+    AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings, GameLevelSettingsCollection,
+    GameSettings, GameStartSettings, InputKeySettings, SpriteSheetAsset, TextureCount,
+    WeaponCollection,
 };
 
 pub struct GameAssetsPlugin;
@@ -28,19 +29,19 @@ impl Plugin for GameAssetsPlugin {
 
         // register ron asset loaders
         app.add_plugins((
-            RonAssetPlugin::<AmmonitionDepot>::new(&["ammonition-settings.ron"]),
-            RonAssetPlugin::<AsteroidPoolCollection>::new(&["asteroid-pool-settings.ron"]),
+            RonAssetPlugin::<AmmonitionDepot>::new(&["ammonition-depot.ron"]),
+            RonAssetPlugin::<AsteroidPoolCollection>::new(&["asteroid-pool-collection.ron"]),
             RonAssetPlugin::<GameSettings>::new(&["game-settings.ron"]),
             RonAssetPlugin::<InputKeySettings>::new(&["input-key-settings.ron"]),
-            RonAssetPlugin::<WeaponCollection>::new(&["weapon-settings.ron"]),
-            RonAssetPlugin::<GameLevelSettingsCollection>::new(&["level-settings.ron"]),
+            RonAssetPlugin::<WeaponCollection>::new(&["weapon-collection.ron"]),
             RonAssetPlugin::<SpriteDynamicAssetCollection>::new(&["sprite-assets.ron"]),
+            RonAssetPlugin::<GameLevelSettingsCollection>::new(&["level-settings.ron"]),
         ));
 
         // register assets that can be dynamically loaded, but are NOT registered through the RonAssetPlugin
         app.init_asset::<SpriteSheetAsset>()
-            .init_asset::<AmmonitionSpriteSheets>()
-            .init_asset::<AsteroidSpriteSheets>();
+            .init_asset::<AmmonitionTextureCollection>()
+            .init_asset::<AsteroidTextureCollection>();
 
         // setup loading of assets
         app.configure_loading_state(
@@ -62,8 +63,8 @@ impl Plugin for GameAssetsPlugin {
                 .init_resource::<WeaponCollection>()
                 .init_resource::<AmmonitionDepot>()
                 .init_resource::<AsteroidPoolCollection>()
-                .init_resource::<AmmonitionSpriteSheets>()
-                .init_resource::<AsteroidSpriteSheets>()
+                .init_resource::<AmmonitionTextureCollection>()
+                .init_resource::<AsteroidTextureCollection>()
                 .init_resource::<GameLevelSettingsCollection>(),
         );
     }

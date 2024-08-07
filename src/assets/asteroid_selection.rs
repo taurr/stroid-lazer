@@ -8,15 +8,15 @@ use crate::utils::RngComponentExt;
 use super::{AsteroidPool, AsteroidPoolCollection};
 
 #[derive(Deserialize, Debug, Reflect, Clone)]
-pub enum AsteroidSplitSelection {
+pub enum AsteroidSelection {
     Pool {
-        name: String,
-        #[serde(default = "AsteroidSplitSelection::default_weight")]
+        key: String,
+        #[serde(default = "AsteroidSelection::default_weight")]
         weight: f32,
     },
 }
 
-impl AsteroidSplitSelection {
+impl AsteroidSelection {
     fn default_weight() -> f32 {
         1.0
     }
@@ -30,7 +30,7 @@ pub trait AsteroidSplitSelectionExt {
     ) -> Option<&'a AsteroidPool>;
 }
 
-impl<C: AsRef<[AsteroidSplitSelection]>> AsteroidSplitSelectionExt for C {
+impl<C: AsRef<[AsteroidSelection]>> AsteroidSplitSelectionExt for C {
     fn pick_random_pool<'a>(
         &self,
         rand: &mut RngComponent,
@@ -41,7 +41,7 @@ impl<C: AsRef<[AsteroidSplitSelection]>> AsteroidSplitSelectionExt for C {
         let weight_sum = slice
             .iter()
             .map(|s| match s {
-                AsteroidSplitSelection::Pool { weight, .. } => *weight,
+                AsteroidSelection::Pool { weight, .. } => *weight,
             })
             .sum();
         let random = rand.f32_range(0.0..weight_sum);
@@ -51,7 +51,7 @@ impl<C: AsRef<[AsteroidSplitSelection]>> AsteroidSplitSelectionExt for C {
             slice
                 .iter()
                 .find(|s| match s {
-                    AsteroidSplitSelection::Pool { weight, .. } => {
+                    AsteroidSelection::Pool { weight, .. } => {
                         w += weight;
                         random < w
                     }
@@ -60,7 +60,7 @@ impl<C: AsRef<[AsteroidSplitSelection]>> AsteroidSplitSelectionExt for C {
         };
 
         match selection {
-            AsteroidSplitSelection::Pool { name, .. } => pool_collection.get(name),
+            AsteroidSelection::Pool { key: name, .. } => pool_collection.get(name),
         }
     }
 }

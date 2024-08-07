@@ -12,8 +12,8 @@ pub struct PlayerSprite;
 #[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone, Copy)]
 pub struct Score(usize);
 
-#[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone, Copy)]
-pub struct EquippedWeapon(usize);
+#[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone)]
+pub struct EquippedWeapon(String);
 
 #[derive(Component, Debug, Clone, Copy)]
 pub struct Dead;
