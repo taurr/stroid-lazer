@@ -339,18 +339,22 @@ pub fn on_player_jumping(
     let (transform, mut rand) = query.get_mut(player).unwrap();
 
     let destination = {
-        // TODO: create setting for minimum jump distance!
-        let game_area = &game_area_settings.game_area;
+        loop {
+            let game_area = &game_area_settings.game_area;
 
-        let min_x = game_area.min.x;
-        let max_x = game_area.max.x;
-        let x = min_x.lerp(max_x, rand.f32());
+            let min_x = game_area.min.x;
+            let max_x = game_area.max.x;
+            let x = min_x.lerp(max_x, rand.f32());
 
-        let min_y = game_area.min.y;
-        let max_y = game_area.max.y;
-        let y = min_y.lerp(max_y, rand.f32());
+            let min_y = game_area.min.y;
+            let max_y = game_area.max.y;
+            let y = min_y.lerp(max_y, rand.f32());
 
-        Vec3::new(x, y, PLAYER_Z_POS)
+            let destination = Vec3::new(x, y, PLAYER_Z_POS);
+            if destination.distance(transform.translation) > player_settings.minimum_jump_distance {
+                break destination;
+            }
+        }
     };
 
     // setup color overlay animation

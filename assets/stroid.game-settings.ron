@@ -4,12 +4,10 @@
         level: "Training Wheels",
         weapon_key: "3-port-special",
         //weapon_key: "1-port-red-laser",
-        // TODO: move to a GeneralSettings section
         minimum_countdown_duration: (
             secs: 1,
             nanos: 0,
         ),
-        // TODO: move to a GeneralSettings section
         countdown_duration: (
             secs: 3,
             nanos: 0,
@@ -24,7 +22,7 @@
             speed_decay: 0.0,
             rotation_speed: 3.141562,
             rotation_speed_acceleration: 15.7,
-            // TODO: move to a GeneralSettings section
+            minimum_jump_distance: 300,
             jump_animation_duration: (
                 secs: 2,
                 nanos: 0,
