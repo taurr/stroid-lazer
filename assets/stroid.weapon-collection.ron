@@ -1,19 +1,28 @@
 ({
     "1-port-red-laser": (
         weapon_ports: [
-            (20, 50), (-20, 50),
+            (position: (0, 20)),
         ],
-        ammonition: [
+        default_ammonition: [
             Exact(name: "red-laser"),
         ],
     ),
     "2-port-red-laser, random green-fast": (
         weapon_ports: [
-            (0, 20),
+            (position: (20, 50)), (position: (-20, 50)),
         ],
-        ammonition: [
+        default_ammonition: [
             Exact(name: "red-laser", weight: 0.8),
             Exact(name: "green-fast-laser", weight: 0.2 ),
+        ],
+    ),
+    "3-port-special": (
+        weapon_ports: [
+            (position: (0, 20), ammonition: [ Exact(name: "green-fast-laser") ]),
+            (position: (20, 50), rotation: -3), (position: (-20, 50), rotation: 3),
+        ],
+        default_ammonition: [
+            Exact(name: "red-laser"),
         ],
     ),
 })

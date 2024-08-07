@@ -40,20 +40,28 @@ pub fn spawn_projectiles(
 
         let (player_transform, player_rotation, mut rand) = player_query.get_mut(*player).unwrap();
 
-        for port_relative_position in weapon_info.weapon_ports.iter() {
-            let port_position = {
+        for weapon_port in weapon_info.weapon_ports.iter() {
+            let direction = Rotation::degrees(weapon_port.rotation) * *player_rotation;
+            debug!(?direction, "projectile direction");
+            let position = {
                 let port_rotation = Rotation::degrees(-90.0) * *player_rotation;
-                (player_transform.translation.truncate() + port_rotation * *port_relative_position)
+                (player_transform.translation.truncate() + port_rotation * weapon_port.position)
                     .extend(player_transform.translation.z)
             };
 
-            let ammonition =
-                pick_random_ammonition_index(&mut rand, &weapon_info.ammonition, &ammonition_depot);
+            let ammonition = pick_random_ammonition_index(
+                &mut rand,
+                weapon_port
+                    .ammonition
+                    .as_ref()
+                    .unwrap_or(&weapon_info.default_ammonition),
+                &ammonition_depot,
+            );
             commands.trigger_targets(
                 SpawnSingleProjectileEvent {
                     state: GameState::Playing,
-                    position: port_position,
-                    direction: *player_rotation,
+                    position,
+                    direction,
                     ammonition,
                 },
                 *player,

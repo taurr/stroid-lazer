@@ -5,7 +5,7 @@ use derive_more::{Deref, DerefMut};
 use serde::Deserialize;
 
 use super::game_assets::GameAssets;
-//use super::optional;
+use super::optional;
 
 /// Loaded as part of the [crate::assets::GameAssets] collection, then inserted as a resource.
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]
@@ -24,8 +24,23 @@ impl FromWorld for WeaponCollection {
 
 #[derive(Reflect, Deserialize, Debug, Clone)]
 pub struct WeaponInfo {
-    pub ammonition: Vec<AmmonitionSelection>,
-    pub weapon_ports: Vec<Vec2>,
+    pub weapon_ports: Vec<WeaponsPort>,
+    pub default_ammonition: Vec<AmmonitionSelection>,
+}
+
+#[derive(Reflect, Deserialize, Debug, Clone)]
+pub struct WeaponsPort {
+    pub position: Vec2,
+    #[serde(default = "WeaponsPort::default_rotation")]
+    pub rotation: f32,
+    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
+    pub ammonition: Option<Vec<AmmonitionSelection>>,
+}
+
+impl WeaponsPort {
+    fn default_rotation() -> f32 {
+        0.0
+    }
 }
 
 #[derive(Deserialize, Debug, Reflect, Clone)]
