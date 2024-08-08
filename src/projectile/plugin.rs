@@ -34,11 +34,11 @@ impl Plugin for ProjectilePlugin {
                 .in_set(ProjectileSet),
         )
         .add_systems(
-            OnEnter(PlayState::StartNextLevel),
+            OnExit(PlayState::StartNextLevel),
             despawn_all_projectiles.in_set(ProjectileSet),
         )
         .add_systems(
-            OnEnter(PlayState::StartNewGame),
+            OnExit(PlayState::StartNewGame),
             despawn_all_projectiles.in_set(ProjectileSet),
         )
         .observe(on_projectile_spawn);

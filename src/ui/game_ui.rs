@@ -4,22 +4,29 @@ use tracing::instrument;
 use crate::{
     asteroid::AsteroidCount,
     player::{Player, Score},
+    states::PlayState,
     GameLevel, GameState,
 };
 
 pub fn build_ui(app: &mut App) {
     let state = GameState::Playing;
 
-    app.add_systems(OnEnter(state), spawn_ui).add_systems(
-        Update,
-        (
-            update_level_text,
-            update_score_text,
-            update_lives_text,
-            update_asteroid_count,
+    app.add_systems(OnEnter(state), spawn_ui)
+        .add_systems(
+            Update,
+            (update_level_text, update_lives_text, update_asteroid_count)
+                .run_if(in_state(PlayState::CountdownBeforeRunning)),
         )
-            .run_if(in_state(state)),
-    );
+        .add_systems(
+            Update,
+            (
+                update_level_text,
+                update_score_text,
+                update_lives_text,
+                update_asteroid_count,
+            )
+                .run_if(in_state(PlayState::Running)),
+        );
 }
 
 #[derive(Component, Debug, Clone)]

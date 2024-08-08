@@ -39,7 +39,6 @@ pub fn spawn_projectiles(
         let weapon_info = &weapon_collection[weapon];
 
         let (player_transform, player_rotation, mut rand) = player_query.get_mut(*player).unwrap();
-
         for weapon_port in weapon_info.weapon_ports.iter() {
             let direction = Rotation::degrees(weapon_port.rotation) * *player_rotation;
             debug!(?direction, "projectile direction");
@@ -63,6 +62,7 @@ pub fn spawn_projectiles(
                     position,
                     direction,
                     ammonition,
+                    audio: weapon_info.audio.clone(),
                 },
                 *player,
             );
@@ -121,6 +121,7 @@ pub fn on_projectile_spawn(
     ammonition_depot: Res<AmmonitionDepot>,
     ammonition_spritesheets: Res<AmmonitionTextureCollection>,
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
     let event = trigger.event();
     let playing_field = playing_field.single();
@@ -133,37 +134,42 @@ pub fn on_projectile_spawn(
     let timeout = ammonition_info.timeout;
 
     commands.entity(playing_field).with_children(|children| {
-        let projectile = children
-            .spawn((
-                Name::new("Projectile"),
-                StateScoped(event.state),
-                Projectile {
-                    timer: Timer::new(timeout, TimerMode::Once),
-                    shot_by_player: trigger.entity(),
-                },
-                Wrapping,
-                RigidBody::Kinematic,
-                SpatialBundle {
-                    transform: Transform::from_translation(event.position),
-                    ..default()
-                },
-                direction,
-                velocity,
-            ))
-            .with_children(|projectile_children| {
-                projectile_children
-                    .spawn(ProjectileSprite)
-                    .insert_spritesheet(ammonitio_gfx, None, || {
-                        (
-                            ProjectileSprite,
-                            CollisionLayers::new(
-                                [CollisionLayer::Laser],
-                                [CollisionLayer::Asteroids],
-                            ),
-                        )
-                    });
-            })
-            .id();
+        let mut projectile = children.spawn((
+            Name::new("Projectile"),
+            StateScoped(event.state),
+            Projectile {
+                timer: Timer::new(timeout, TimerMode::Once),
+                shot_by_player: trigger.entity(),
+            },
+            Wrapping,
+            RigidBody::Kinematic,
+            SpatialBundle {
+                transform: Transform::from_translation(event.position),
+                ..default()
+            },
+            direction,
+            velocity,
+        ));
+
+        projectile.with_children(|projectile_children| {
+            projectile_children
+                .spawn(ProjectileSprite)
+                .insert_spritesheet(ammonitio_gfx, None, || {
+                    (
+                        ProjectileSprite,
+                        CollisionLayers::new([CollisionLayer::Laser], [CollisionLayer::Asteroids]),
+                    )
+                });
+        });
+
+        if let Some(audio) = &event.audio {
+            projectile.insert(AudioBundle {
+                source: asset_server.load(audio),
+                settings: PlaybackSettings::ONCE,
+            });
+        }
+
+        let projectile = projectile.id();
         debug!(?projectile, "Spawned projectile");
     });
 }

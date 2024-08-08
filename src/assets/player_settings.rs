@@ -26,6 +26,8 @@ pub struct PlayerSettingOptions {
     pub jump_animation_duration: Option<Duration>,
     #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
     pub minimum_jump_distance: Option<f32>,
+    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
+    pub flames_audio: Option<String>,
 }
 
 /// Resource is initialized during [crate::states::init_level_settings].
@@ -40,6 +42,8 @@ pub struct PlayerSettings {
     pub rotation_speed_acceleration: f32,
     pub jump_animation_duration: Duration,
     pub minimum_jump_distance: f32,
+    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
+    pub flames_audio: Option<String>,
 }
 
 impl PlayerSettings {
@@ -71,6 +75,9 @@ impl PlayerSettings {
             }
             if let Some(value) = &options.minimum_jump_distance {
                 self.minimum_jump_distance = *value;
+            }
+            if options.flames_audio.is_some() {
+                self.flames_audio = options.flames_audio.clone();
             }
         }
         self

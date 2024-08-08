@@ -324,6 +324,12 @@ pub fn on_player_death(
     }
 }
 
+pub fn dont_accelerate(players: Query<Entity, With<Player>>, mut commands: Commands) {
+    for player in players.iter() {
+        commands.entity(player).remove::<Accelerating>();
+    }
+}
+
 #[instrument(skip_all)]
 pub fn on_player_firing(
     trigger: Trigger<PlayerFireEvent>,
