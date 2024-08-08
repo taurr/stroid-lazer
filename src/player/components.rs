@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use derive_more::{Deref, DerefMut, *};
+use derive_more::{Debug, Deref, DerefMut, Display, Constructor};
 
 #[derive(Component, Debug, Clone, Copy)]
 pub struct Player {
