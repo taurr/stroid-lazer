@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use tracing::instrument;
 
 use super::Accelerating;
-use crate::assets::{game_assets::FlameSpriteSheet, EntityCommandsExt};
+use crate::assets::{game_assets::FlameSpriteSheet, EntityCommandsExt, PlayerSettings};
 
 pub fn init_rocket_flames(app: &mut App) {
     app.observe(on_add_accelerating)
@@ -17,13 +17,18 @@ fn on_add_accelerating(
     trigger: Trigger<OnAdd, Accelerating>,
     mut commands: Commands,
     spritesheet_asset: FlameSpriteSheet,
+    asset_server: Res<AssetServer>,
+    player_settings: Res<PlayerSettings>,
 ) {
     commands.entity(trigger.entity()).with_children(|children| {
-        children.spawn(RocketFlames).insert_spritesheet(
-            spritesheet_asset.spritesheet(),
-            None,
-            || (),
-        );
+        let mut flame = children.spawn(RocketFlames);
+        if let Some(audio) = &player_settings.flames_audio {
+            flame.insert(AudioBundle {
+                source: asset_server.load(audio),
+                settings: PlaybackSettings::LOOP,
+            });
+        }
+        flame.insert_spritesheet(spritesheet_asset.spritesheet(), None, || ());
     });
     trace!("Added rocket flame");
 }

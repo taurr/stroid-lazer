@@ -24,5 +24,6 @@
         default_ammonition: [
             Exact(name: "red-laser"),
         ],
+        audio: "audio/laser-104024.ogg"
     ),
 })

@@ -26,6 +26,8 @@ impl FromWorld for WeaponCollection {
 pub struct WeaponInfo {
     pub weapon_ports: Vec<WeaponsPort>,
     pub default_ammonition: Vec<AmmonitionSelection>,
+    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
+    pub audio: Option<String>,
 }
 
 #[derive(Reflect, Deserialize, Debug, Clone)]

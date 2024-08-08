@@ -27,6 +27,7 @@
                 secs: 2,
                 nanos: 0,
             ),
+            flames_audio: "audio/rocketthrustmaxx-100019.ogg"
         ),
     ),
     game_area: (

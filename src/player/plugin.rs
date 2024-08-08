@@ -45,6 +45,10 @@ impl Plugin for PlayerPlugin {
         .add_systems(
             OnEnter(PlayState::Running),
             resume_player_movement.in_set(PlayerSet),
+        )
+        .add_systems(
+            OnExit(PlayState::Running),
+            dont_accelerate.in_set(PlayerSet),
         );
 
         app.add_systems(

@@ -15,6 +15,7 @@ pub struct SpawnSingleProjectileEvent {
     pub position: Vec3,
     pub direction: Rotation,
     pub ammonition: String,
+    pub audio: Option<String>,
 }
 
 #[allow(unused)]

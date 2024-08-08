@@ -15,8 +15,7 @@ use crate::{
         PLAYINGFIELD_POS,
     },
     movement::MovementPaused,
-    player::Player,
-    projectile::{Projectile, ProjectileSprite},
+    projectile::Projectile,
     GameLevel, PlayingField,
 };
 
@@ -111,9 +110,10 @@ impl Plugin for GameStatesPlugin {
                 .in_set(GameStatesSet),
         )
         .add_systems(
-            OnEnter(PlayState::StartNextLevel),
+            Update,
             (start_next_level, init_level_settings)
                 .chain()
+                .run_if(in_state(PlayState::StartNextLevel))
                 .in_set(GameStatesSet),
         )
         .add_systems(
@@ -303,9 +303,12 @@ pub fn init_level_settings(
         .clone()
         .merge(level_settings.player.as_ref());
 
-    debug!(?player_settings, "inserting PlayerSettings as resource");
+    debug!(
+        ?player_settings,
+        ?level_settings,
+        "inserting PlayerSettings & LevelSettings as resources"
+    );
     commands.insert_resource(player_settings);
-    debug!(?level_settings, "inserting LevelSettings as resource");
     commands.insert_resource(level_settings.clone());
 }
 
@@ -344,21 +347,25 @@ fn start_new_game(
 /// Currently, just go directly to the countdown state.
 #[instrument(skip_all)]
 fn start_after_death(
-    projectiles: Query<Entity, With<ProjectileSprite>>,
+    projectiles: Query<Entity, With<Projectile>>,
     mut next: ResMut<NextState<PlayState>>,
 ) {
     if projectiles.is_empty() {
         info!("restarting after death");
         next.set(PlayState::CountdownBeforeRunning);
-        return;
     }
 }
 
 /// Currently, just go directly to the countdown state.
 #[instrument(skip_all)]
-fn start_next_level(mut next: ResMut<NextState<PlayState>>) {
-    info!("starting next level");
-    next.set(PlayState::CountdownBeforeRunning);
+fn start_next_level(
+    projectiles: Query<Entity, With<Projectile>>,
+    mut next: ResMut<NextState<PlayState>>,
+) {
+    if projectiles.iter().count() == 0 {
+        info!("starting next level");
+        next.set(PlayState::CountdownBeforeRunning);
+    }
 }
 
 /// Detects when all asteroids have been destroyed, and all projectiles are gone, then transitions
@@ -366,33 +373,28 @@ fn start_next_level(mut next: ResMut<NextState<PlayState>>) {
 #[instrument(skip_all)]
 fn detect_level_cleared(
     asteroid_counter: Res<AsteroidCount>,
-    player: Query<Entity, (With<Player>, Without<MovementPaused>)>,
-    projectiles: Query<Entity, With<Projectile>>,
     level_settings: Res<GameLevelSettings>,
     mut current_level: ResMut<GameLevel>,
-    mut commands: Commands,
     mut next: ResMut<NextState<PlayState>>,
 ) {
     if **asteroid_counter == 0 {
-        if let Ok(player) = player.get_single() {
-            commands.entity(player).insert(MovementPaused);
-        }
-        let projectiles = projectiles.iter().len();
-        if projectiles == 0 {
-            let Some(next_level) = &level_settings.next_level else {
-                warn!("won the game!");
-                next.set(PlayState::GameOver(GameOverReason::GameWon));
-                return;
-            };
+        //if let Ok(player) = player.get_single() {
+        //    commands.entity(player).insert(MovementPaused);
+        //}
+        let Some(next_level) = &level_settings.next_level else {
+            warn!("won the game!");
+            next.set(PlayState::GameOver(GameOverReason::GameWon));
+            return;
+        };
 
-            info!(next_level, "level cleared, starting next level");
-            **current_level = next_level.clone();
-            next.set(PlayState::StartNextLevel);
-        }
+        info!(next_level, "level cleared, starting next level");
+        **current_level = next_level.clone();
+        next.set(PlayState::StartNextLevel);
     }
 }
 
 /// Whenever the primary window looses focus, transitions to [PlayState::Paused].
+#[instrument(skip_all)]
 fn pause_when_window_looses_focus(
     query: Query<&Window, With<PrimaryWindow>>,
     state: Res<State<PlayState>>,
