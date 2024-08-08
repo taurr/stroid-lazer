@@ -72,44 +72,53 @@ pub fn player_acceleration_and_turning(
 
 #[instrument(skip_all)]
 pub fn detect_player_collisions(
-    collision_query: Query<
-        (&ColliderParent, &CollidingEntities),
-        (With<PlayerSprite>, Changed<CollidingEntities>),
-    >,
+    player_collision_query: Query<(&ColliderParent, &CollidingEntities), With<PlayerSprite>>,
     player_query: Query<&Transform, (With<Player>, Without<Jumping>, Without<Dead>)>,
+    asteroid_query: Query<&Parent>,
     mut commands: Commands,
 ) {
     // collect all player collisions by player (in case of multiple players)
-    let collisions = collision_query
+    let player_collisions = player_collision_query
         .into_iter()
-        .into_grouping_map_by(|(parent, _)| parent.get())
+        .into_grouping_map_by(|(player_parent, _)| player_parent.get())
         .fold(vec![], |mut acc, _key, (_, collisions)| {
-            acc.extend(collisions.iter().copied());
+            let asteroids = collisions
+                .iter()
+                .filter_map(|entity| asteroid_query.get(*entity).ok().map(|p| p.get()));
+            acc.extend(asteroids);
             acc
         });
 
     // filter out players that don't fullfill our criteria
-    let collisions = collisions
+    let player_collisions = player_collisions
         .into_iter()
-        .filter_map(|(player, colliding_entities)| {
+        .filter_map(|(player, asteroids)| {
             // we're only interested in actual collisions
-            if colliding_entities.is_empty() {
+            if asteroids.is_empty() {
                 return None;
             }
             // with players that fullfill our criteria
             player_query
                 .get(player)
-                .map(|transform| (player, transform, colliding_entities))
+                .map(|transform| (player, transform, asteroids))
                 .ok()
-        });
+        })
+        .collect_vec();
+    if player_collisions.is_empty() {
+        return;
+    }
 
-    for (player, transform, colliding_entities) in collisions {
+    for (player, transform, asteroids) in player_collisions {
         debug!(
             ?player,
-            ?colliding_entities,
+            ?asteroids,
             position=?transform.translation,
             "Player collisions"
         );
+        asteroids.iter().for_each(|asteroid| {
+            debug!(?asteroid, "clearing colliding asteroid");
+            commands.entity(*asteroid).despawn_recursive();
+        });
         commands.entity(player).insert(Dead);
         commands.trigger_targets(PlayerDeadEvent {}, player);
     }

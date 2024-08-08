@@ -1,7 +1,7 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
-use crate::PlayState;
+use crate::{states::GameState, PlayState};
 
 use super::*;
 
@@ -22,10 +22,15 @@ impl Plugin for ProjectilePlugin {
             Update,
             (
                 spawn_projectiles.run_if(on_event::<SpawnProjectilesEvent>()),
-                timeout_projectiles,
                 detect_projetile_collision.run_if(on_event::<CollisionStarted>()),
             )
                 .run_if(in_state(PlayState::Running))
+                .in_set(ProjectileSet),
+        )
+        .add_systems(
+            Update,
+            (timeout_projectiles,)
+                .run_if(in_state(GameState::Playing))
                 .in_set(ProjectileSet),
         )
         .add_systems(

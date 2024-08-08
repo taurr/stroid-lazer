@@ -16,7 +16,7 @@ use crate::{
     },
     movement::MovementPaused,
     player::Player,
-    projectile::Projectile,
+    projectile::{Projectile, ProjectileSprite},
     GameLevel, PlayingField,
 };
 
@@ -105,8 +105,10 @@ impl Plugin for GameStatesPlugin {
                 .in_set(GameStatesSet),
         )
         .add_systems(
-            OnEnter(PlayState::StartAfterDeath),
-            start_after_death.in_set(GameStatesSet),
+            Update,
+            start_after_death
+                .run_if(in_state(PlayState::StartAfterDeath))
+                .in_set(GameStatesSet),
         )
         .add_systems(
             OnEnter(PlayState::StartNextLevel),
@@ -146,6 +148,7 @@ fn pause_movement(
         Entity,
         (
             Without<MovementPaused>,
+            Without<Projectile>,
             Or<(With<LinearVelocity>, With<AngularVelocity>)>,
         ),
     >,
@@ -340,9 +343,15 @@ fn start_new_game(
 
 /// Currently, just go directly to the countdown state.
 #[instrument(skip_all)]
-fn start_after_death(mut next: ResMut<NextState<PlayState>>) {
-    info!("restarting after death");
-    next.set(PlayState::CountdownBeforeRunning);
+fn start_after_death(
+    projectiles: Query<Entity, With<ProjectileSprite>>,
+    mut next: ResMut<NextState<PlayState>>,
+) {
+    if projectiles.is_empty() {
+        info!("restarting after death");
+        next.set(PlayState::CountdownBeforeRunning);
+        return;
+    }
 }
 
 /// Currently, just go directly to the countdown state.
