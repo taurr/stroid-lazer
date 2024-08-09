@@ -15,7 +15,7 @@ pub struct AsteroidSpawnNewEvent {
     pub linear_velocity: LinearVelocity,
     pub angular_velocity: AngularVelocity,
 
-    pub hit_behavior: AsteroidHitBehavior,
+    pub hit_behavior: Vec<AsteroidHitBehavior>,
 
     pub spritesheet: SpriteSheetAsset,
     pub atlas_index: usize,

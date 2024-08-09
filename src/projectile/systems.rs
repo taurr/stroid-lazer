@@ -1,5 +1,5 @@
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
 use tracing::instrument;
 
@@ -161,15 +161,35 @@ pub fn on_projectile_spawn(
                     )
                 });
         });
+        let projectile = projectile.id();
 
         if let Some(audio) = &event.audio {
-            projectile.insert(AudioBundle {
-                source: asset_server.load(audio),
-                settings: PlaybackSettings::ONCE,
-            });
+            // spawn the audio as a parallel entity, as we want the audio effect to play in its entirety
+            // even if the projectile is despawned
+            children.spawn((
+                Name::new("Projectile Audio"),
+                StateScoped(event.state),
+                Projectile {
+                    timer: Timer::new(timeout, TimerMode::Once),
+                    shot_by_player: trigger.entity(),
+                },
+                Wrapping,
+                RigidBody::Kinematic,
+                SpatialBundle {
+                    transform: Transform::from_translation(event.position),
+                    ..default()
+                },
+                direction,
+                velocity,
+                AudioBundle {
+                    source: asset_server.load(audio),
+                    settings: PlaybackSettings::DESPAWN
+                        .with_spatial(true)
+                        .with_volume(Volume::new(0.6)),
+                },
+            ));
         }
 
-        let projectile = projectile.id();
         debug!(?projectile, "Spawned projectile");
     });
 }

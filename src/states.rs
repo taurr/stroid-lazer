@@ -181,6 +181,12 @@ fn setup_camera_and_playing_field(
         "setting up camera and playing field"
     );
 
+    // Spawn a spatial listener
+    commands.spawn((
+        SpatialBundle::default(),
+        SpatialListener::new(game_area.width() / 2.0),
+    ));
+
     // The PlayingField is placed at (0,0) - world center.
     // All asteroids, ships, lazers etc. will be added as children of the PlayingField, thus
     // their positions are relative to the PlayingField, making it easy to move everything

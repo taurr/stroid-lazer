@@ -26,14 +26,14 @@ impl FromWorld for AsteroidPoolCollection {
 pub struct AsteroidPool {
     /// spritesheets to choose from when spawning from this pool
     pub textures: Vec<AsteroidTextureSelection>,
-    /// default range to find the asteroid speed within
-    pub speed: AsteroidSpeedRange,
     /// how far to displace the asteroid position when spawning as a result of being shot!
     pub displacement: AsteroidDisplacement,
+    /// default range to find the asteroid speed within
+    pub velocity: AsteroidSpeedRange,
     /// default rotation of the asteroid
-    pub rotation: AsteroidRotationSpeed,
+    pub angular_velocity: AsteroidRotationSpeed,
     /// how does asteroid behave when hit
-    pub hit_behavior: AsteroidHitBehavior,
+    pub hit_behavior: Vec<AsteroidHitBehavior>,
 }
 
 #[derive(Deserialize, Debug, Reflect, Clone)]
@@ -53,15 +53,16 @@ pub enum AsteroidTextureSelection {
     },
 }
 
-#[derive(Component, Deserialize, Debug, Reflect, Clone)]
+#[derive(Deserialize, Debug, Reflect, Clone)]
 pub enum AsteroidHitBehavior {
     None,
     Points(usize),
-    PointsAndSplit {
-        points: usize,
+    Split {
         count: AsteroidSplitCount,
         select_from: Vec<AsteroidSelection>,
     },
+    Despawn,
+    Audio(String),
 }
 
 #[derive(Deserialize, Debug, Reflect, Clone, Copy)]

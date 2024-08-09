@@ -158,7 +158,9 @@ pub fn spawn_new_player(
     let position = Position::new(player_settings.spawn_position);
     let facing_direction = Rotation::radians(rand.f32() * TAU);
     let velocity = LinearVelocity(
-        player_settings.speed_range.start * Vec2::from_angle(rand.f32_normalized() * TAU),
+        (player_settings.speed_range.start
+            + (player_settings.speed_range.end - player_settings.speed_range.start) / 16.0)
+            * Vec2::from_angle(rand.f32_normalized() * TAU),
     );
     let input_manager_bundle = {
         InputManagerBundle::with_map(InputMap::new([
