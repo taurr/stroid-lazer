@@ -4,7 +4,7 @@
         speed: 1000.0,
         timeout: (
             secs: 0,
-            nanos: 325000000,
+            nanos: 150000000,
         ),
     ),
     "green-fast-laser": (
@@ -12,7 +12,7 @@
         speed: 2000.0,
         timeout: (
             secs: 0,
-            nanos: 650000000,
+            nanos: 350000000,
         ),
     ),
 })
