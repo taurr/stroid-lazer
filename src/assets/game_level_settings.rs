@@ -23,9 +23,10 @@ impl FromWorld for GameLevelSettingsCollection {
 /// Resource is initialized during [crate::states::init_level_settings].
 #[derive(Resource, Deserialize, Reflect, Debug, Clone)]
 pub struct GameLevelSettings {
-    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
-    pub player: Option<PlayerSettingOptions>,
+    pub background: String,
     pub startup: LevelStartupSettings,
     #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
     pub next_level: Option<String>,
+    #[serde(with = "optional", skip_serializing_if = "Option::is_none", default)]
+    pub player: Option<PlayerSettingOptions>,
 }
