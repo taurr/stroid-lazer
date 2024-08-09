@@ -5,4 +5,8 @@
     "weapon-collection": File(path:"stroid.weapon-collection.ron"),
     "ammonition-depot": File(path:"stroid.ammonition-depot.ron"),
     "asteroid-pool-collection": File(path:"stroid.asteroid-pool-collection.ron"),
+
+    "background-main-menu": File(path:"state-backgrounds/space-7709489_1920.jpg"),
+    "background-game-over": File(path:"state-backgrounds/space-7709489_1920.jpg"),
+    "background-game-won": File(path:"state-backgrounds/space-7709489_1920.jpg"),
 })

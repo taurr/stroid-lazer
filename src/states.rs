@@ -7,7 +7,7 @@ use tracing::instrument;
 use crate::{
     assets::{
         DefaultLevelSettings, GameAreaSettings, GameLevelSettings, GameLevelSettingsCollection,
-        GameStartSettings,
+        GameStartSettings, StateBackgrounds,
     },
     asteroid::AsteroidCount,
     constants::{
@@ -79,6 +79,15 @@ impl Plugin for GameStatesPlugin {
             LoadingState::new(GameState::LoadingAssets).continue_to_state(GameState::MainMenu),
         );
 
+        app.add_systems(
+            PreUpdate,
+            set_state_background
+                .run_if(
+                    not(in_state(GameState::LoadingAssets))
+                        .and_then(state_changed::<GameState>.or_else(state_changed::<PlayState>)),
+                )
+                .in_set(GameStatesSet),
+        );
         #[cfg(feature = "cmd_line")]
         app.add_systems(
             Update,
@@ -90,7 +99,8 @@ impl Plugin for GameStatesPlugin {
                     next.set(GameState::Playing);
                 }
             })
-            .run_if(in_state(GameState::MainMenu)),
+            .run_if(in_state(GameState::MainMenu))
+            .in_set(GameStatesSet),
         );
 
         app.add_systems(
@@ -117,10 +127,8 @@ impl Plugin for GameStatesPlugin {
         )
         .add_systems(
             OnExit(PlayState::StartNextLevel),
-            init_level_settings
-                .in_set(GameStatesSet),
+            init_level_settings.in_set(GameStatesSet),
         )
-
         .add_systems(
             OnEnter(PlayState::Running),
             resume_movement.in_set(GameStatesSet),
@@ -289,6 +297,37 @@ fn resume_movement(query: Query<Entity, With<MovementAutoPaused>>, mut commands:
             .entity(entity)
             .remove::<MovementPaused>()
             .remove::<MovementAutoPaused>();
+    }
+}
+
+fn set_state_background(
+    game_state: Res<State<GameState>>,
+    play_state: Option<Res<State<PlayState>>>,
+    background_query: Query<Entity, With<Background>>,
+    backgrounds: Res<StateBackgrounds>,
+    mut commands: Commands,
+) {
+    let background = match **game_state {
+        GameState::LoadingAssets => None,
+        GameState::MainMenu => Some(backgrounds.main_menu.clone()),
+        GameState::Playing => match **play_state.unwrap() {
+            PlayState::StartNewGame => None,
+            PlayState::StartAfterDeath => None,
+            PlayState::StartNextLevel => None,
+            PlayState::CountdownBeforeRunning => None,
+            PlayState::Running => None,
+            PlayState::Paused => None,
+            PlayState::GameOver(reason) => match reason {
+                GameOverReason::PlayerDead => Some(backgrounds.game_over.clone()),
+                GameOverReason::GameWon => Some(backgrounds.game_won.clone()),
+            },
+        },
+    };
+
+    if let Some(background) = background {
+        commands
+            .entity(background_query.single())
+            .insert(background);
     }
 }
 

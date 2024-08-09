@@ -8,8 +8,8 @@ use super::{
     game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
     AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
     AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings, GameLevelSettingsCollection,
-    GameSettings, GameStartSettings, InputKeySettings, SpriteSheetAsset, TextureCount,
-    WeaponCollection,
+    GameSettings, GameStartSettings, InputKeySettings, SpriteSheetAsset, StateBackgrounds,
+    TextureCount, WeaponCollection,
 };
 
 pub struct GameAssetsPlugin;
@@ -55,6 +55,7 @@ impl Plugin for GameAssetsPlugin {
                 )
                 // TODO: load dynamically found dynamic_assets_files after the above!
                 .load_collection::<GameAssets>()
+                .load_collection::<StateBackgrounds>()
                 // These are loaded settings that are added as resources via their [FromWorld] implementations
                 .init_resource::<GameAreaSettings>()
                 .init_resource::<GameStartSettings>()

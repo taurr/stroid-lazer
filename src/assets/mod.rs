@@ -15,6 +15,7 @@ mod player_settings;
 mod plugin;
 mod sprite_dynamic_asset_collection;
 mod sprite_sheet_asset;
+mod state_backgrounds;
 mod weapon_collection;
 
 pub mod game_assets;
@@ -34,4 +35,5 @@ pub use input_key_settings::*;
 pub use level_startup_settings::*;
 pub use player_settings::*;
 pub use sprite_sheet_asset::*;
+pub use state_backgrounds::*;
 pub use weapon_collection::*;
