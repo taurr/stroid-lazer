@@ -26,7 +26,7 @@ pub fn accept_player_input(
             Option<&Accelerating>,
             Option<&Turning>,
         ),
-        (With<Player>, Changed<ActionState<PlayerAction>>),
+        With<Player>
     >,
     mut commands: Commands,
     time: Res<Time>,
@@ -70,15 +70,15 @@ pub fn accept_player_input(
     let turn_left = action_state.pressed(&PlayerAction::TurnLeft);
     let turn_right = action_state.pressed(&PlayerAction::TurnRight);
     match (turning, turn_left, turn_right) {
-        (None, true, false) => {
+        (None, true, false) | (Some(Turning::Right(..)), true, false) => {
             trace!(?turning, ?turn_left, ?turn_right, "turning left");
             commands.entity(player).insert(Turning::Left(0.0));
         }
-        (None, false, true) => {
+        (None, false, true) | (Some(Turning::Left(..)), false, true) => {
             trace!(?turning, ?turn_left, ?turn_right, "turning right");
             commands.entity(player).insert(Turning::Right(0.0));
         }
-        (Some(_), false, false) => {
+        (Some(_), false, false) | (Some(_), true, true) => {
             trace!(?turning, ?turn_left, ?turn_right, "stopped turning");
             commands.entity(player).remove::<Turning>();
         }

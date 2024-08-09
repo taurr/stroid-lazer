@@ -21,7 +21,7 @@
     "3-port-special": (
         weapon_ports: [
             (position: (0, 20), ammonition: [ Exact(name: "green-fast-laser") ]),
-            (position: (20, 50), rotation: -3), (position: (-20, 50), rotation: 3),
+            (position: (20, 50), rotation: -4), (position: (-20, 50), rotation: 4),
         ],
         default_ammonition: [
             Exact(name: "red-laser"),

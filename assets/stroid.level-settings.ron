@@ -40,5 +40,31 @@
                 ],
             ),
         ),
+         next_level: "Work in progress",
+    ),
+    "Work in progress": (
+        background: "backgrounds/science-fiction-1424446_1920.jpg",
+        startup: (
+            asteroids: (
+                count: Exact(12),
+                select_from: [
+                    Pool(key: "starter-asteroid-pool", weight: 0.9),
+                    Pool(key: "trick-final-asteroid-pool", weight: 0.1),
+                ],
+            ),
+        ),
+         next_level: "Work in progress2",
+    ),
+    "Work in progress2": (
+        background: "backgrounds/space-911785_1920.jpg",
+        startup: (
+            asteroids: (
+                count: Exact(17),
+                select_from: [
+                    Pool(key: "final-asteroid-pool", weight: 0.7),
+                    Pool(key: "trick-final-asteroid-pool", weight: 0.3),
+                ],
+            ),
+        ),
     ),
 })
