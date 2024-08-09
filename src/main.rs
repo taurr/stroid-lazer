@@ -1,5 +1,8 @@
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{
+    audio::{AudioPlugin, SpatialScale},
+    prelude::*,
+};
 use bevy_turborand::prelude::RngPlugin;
 use bevy_tweening::TweeningPlugin;
 use derive_more::{Deref, DerefMut};
@@ -21,6 +24,7 @@ mod utils;
 use self::{
     assets::GameAssetsPlugin,
     asteroid::AsteroidPlugin,
+    constants::AUDIO_SCALE,
     movement::MovementPlugin,
     player::PlayerPlugin,
     projectile::ProjectilePlugin,
@@ -47,20 +51,27 @@ fn main() -> AppExit {
 
     app.init_resource::<GameLevel>()
         .insert_resource(ClearColor(bevy::color::palettes::css::BLACK.into()))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "Stroid-Lazer".into(),
-                resolution: Vec2::new(800., 800.).into(),
-                present_mode: bevy::window::PresentMode::Fifo,
-                resize_constraints: WindowResizeConstraints {
-                    min_width: 550.0,
-                    min_height: 400.0,
-                    ..Default::default()
-                },
-                ..default()
-            }),
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(AudioPlugin {
+                    default_spatial_scale: SpatialScale::new_2d(AUDIO_SCALE),
+                    ..default()
+                })
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "Stroid-Lazer".into(),
+                        resolution: Vec2::new(800., 800.).into(),
+                        present_mode: bevy::window::PresentMode::Fifo,
+                        resize_constraints: WindowResizeConstraints {
+                            min_width: 550.0,
+                            min_height: 400.0,
+                            ..Default::default()
+                        },
+                        ..default()
+                    }),
+                    ..default()
+                }),
+        )
         .add_plugins((RngPlugin::default(), TweeningPlugin));
 
     app.add_plugins((

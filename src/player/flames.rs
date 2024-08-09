@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use tracing::instrument;
 
 use super::Accelerating;
@@ -25,7 +25,11 @@ fn on_add_accelerating(
         if let Some(audio) = &player_settings.flames_audio {
             flame.insert(AudioBundle {
                 source: asset_server.load(audio),
-                settings: PlaybackSettings::LOOP,
+                settings: PlaybackSettings {
+                    volume: Volume::new(1.0),
+                    spatial: true,
+                    ..PlaybackSettings::LOOP
+                }
             });
         }
         flame.insert_spritesheet(spritesheet_asset.spritesheet(), None, || ());

@@ -6,6 +6,7 @@
         default_ammonition: [
             Exact(name: "red-laser"),
         ],
+        audio: "audio/laser_gun_sound-40813.ogg",
     ),
     "2-port-red-laser, random green-fast": (
         weapon_ports: [
@@ -15,6 +16,7 @@
             Exact(name: "red-laser", weight: 0.8),
             Exact(name: "green-fast-laser", weight: 0.2 ),
         ],
+        audio: "audio/shoot02wav-14562.ogg",
     ),
     "3-port-special": (
         weapon_ports: [
@@ -24,6 +26,6 @@
         default_ammonition: [
             Exact(name: "red-laser"),
         ],
-        audio: "audio/laser-104024.ogg"
+        audio: "audio/laser-104024.ogg",
     ),
 })

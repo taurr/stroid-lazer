@@ -11,10 +11,14 @@
             AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 7),
             AtlasIndex(key: "small-asteroid-atlas", atlas_idx: 8),
         ],
-        speed: Range(start: 50, end: 70),
         displacement: Exact(10),
-        rotation: Range(start: -2.0, end: 2.0),
-        hit_behavior: Points(25),
+        velocity: Range(start: 50, end: 70),
+        angular_velocity: Range(start: -2.0, end: 2.0),
+        hit_behavior: [
+            Audio("audio/explosion-91872.ogg"),
+            Points(25),
+            Despawn,
+        ],
     ),
     "trick-final-asteroid-pool": (
         textures: [
@@ -28,14 +32,18 @@
             AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 7),
             AtlasIndex(key: "small-red-asteroid-atlas", atlas_idx: 8),
         ],
-        speed: Exact(50),
         displacement: None,
-        rotation: Range(start: -1.5, end: 1.5),
-        hit_behavior: PointsAndSplit(
-            points: 33,
-            count: Exact(1),
-            select_from: [ Pool(key: "final-asteroid-pool") ]
-        ),
+        velocity: Exact(50),
+        angular_velocity: Range(start: -1.5, end: 1.5),
+        hit_behavior: [
+            Audio("audio/explosion-91872.ogg"),
+            Points(33),
+            Split(
+                count: Exact(1),
+                select_from: [ Pool(key: "final-asteroid-pool") ]
+            ),
+            Despawn,
+        ],
     ),
     "mid-asteroid-pool": (
         textures: [
@@ -49,17 +57,21 @@
             AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 7),
             AtlasIndex(key: "medium-asteroid-atlas", atlas_idx: 8),
         ],
-        speed: Range(start: 40, end: 60),
         displacement: Range(start: 20, end: 40),
-        rotation: Range(start: -1.0, end: 1.0),
-        hit_behavior: PointsAndSplit(
-            points: 20,
-            count: Exact(3),
-            select_from: [
-                Pool(key: "final-asteroid-pool", weight: 0.8),
-                Pool(key: "trick-final-asteroid-pool", weight: 0.2),
-            ]
-        ),
+        velocity: Range(start: 40, end: 60),
+        angular_velocity: Range(start: -1.0, end: 1.0),
+        hit_behavior: [
+            Audio("audio/explosion-91872.ogg"),
+            Points(20),
+            Split(
+                count: Exact(3),
+                select_from: [
+                    Pool(key: "final-asteroid-pool", weight: 0.8),
+                    Pool(key: "trick-final-asteroid-pool", weight: 0.2),
+                ]
+            ),
+            Despawn,
+        ],
     ),
     "starter-asteroid-pool": (
         textures: [
@@ -73,13 +85,17 @@
             AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 7),
             AtlasIndex(key: "big-asteroid-atlas", atlas_idx: 8),
         ],
-        speed: Range(start: 30, end: 50),
         displacement: Range(start: 30, end: 70),
-        rotation: Range(start: -1.0, end: 1.0),
-        hit_behavior: PointsAndSplit(
-            points: 15,
-            count: Range(start: 2, end: 4),
-            select_from: [ Pool(key: "mid-asteroid-pool") ]
-        ),
+        velocity: Range(start: 30, end: 50),
+        angular_velocity: Range(start: -1.0, end: 1.0),
+        hit_behavior: [
+            Audio("audio/medium-explosion-40472.ogg"),
+            Points(15),
+            Split(
+                count: Range(start: 2, end: 4),
+                select_from: [ Pool(key: "mid-asteroid-pool") ]
+            ),
+            Despawn
+        ],
     ),
 })

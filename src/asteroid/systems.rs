@@ -1,7 +1,7 @@
 use std::f32::consts::TAU;
 
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
 use tracing::instrument;
 
@@ -166,7 +166,7 @@ pub fn on_asteroid_spawn_new(
             Position::new(event.position.truncate()),
             event.linear_velocity,
             event.angular_velocity,
-            event.hit_behavior.clone(),
+            HitBehavior::from(event.hit_behavior.clone()),
             Wrapping,
             rand,
         ));
@@ -264,72 +264,90 @@ pub fn detect_asteroid_hits(
 pub fn on_asteroid_hit(
     trigger: Trigger<AsteroidHitEvent>,
     mut playing_field: Query<(Entity, &mut RngComponent), With<PlayingField>>,
-    mut hit_behavior_query: Query<&AsteroidHitBehavior>,
+    hit_behavior_query: Query<&HitBehavior>,
     asteroid_pool_collection: Res<AsteroidPoolCollection>,
     asteroid_spritesheets: Res<AsteroidTextureCollection>,
     mut score_events: EventWriter<AddToScoreEvent>,
     mut remove_events: EventWriter<AsteroidRemoveEvent>,
     mut commands: Commands,
     playstate: Res<State<PlayState>>,
+    asset_server: Res<AssetServer>,
 ) {
     let hit_evt = trigger.event();
     let asteroid = trigger.entity();
     let (playing_field, mut rand) = playing_field.single_mut();
-    let hit_behavior = hit_behavior_query.get_mut(asteroid).unwrap();
 
-    match hit_behavior {
-        AsteroidHitBehavior::None => {}
-        AsteroidHitBehavior::Points(points) => {
-            add_to_score(*points, &hit_evt.players, &mut score_events);
-        }
-        AsteroidHitBehavior::PointsAndSplit {
-            points,
-            count,
-            select_from,
-        } => {
-            for _ in match count {
-                AsteroidSplitCount::Exact(max) => 0..*max,
-                AsteroidSplitCount::Range { start, end } => 0..rand.usize(start..end),
-            } {
-                let Some(pool) = select_from.pick_random_pool(&mut rand, &asteroid_pool_collection)
-                else {
-                    warn!("did not find an asteroid pool");
-                    continue;
-                };
+    for hit_behavior in hit_behavior_query.get(asteroid).unwrap().iter() {
+        match hit_behavior {
+            AsteroidHitBehavior::None => {}
 
-                let position = match &pool.displacement {
-                    AsteroidDisplacement::None => hit_evt.position,
-                    AsteroidDisplacement::Exact(distance) => {
-                        let angle = rand.f32_range(0.0..TAU);
-                        let displacement = Vec2::from_angle(angle) * *distance;
-                        hit_evt.position + displacement.extend(0.0)
-                    }
-                    AsteroidDisplacement::Range { start, end } => {
-                        let angle = rand.f32_range(0.0..TAU);
-                        let distance = rand.f32_range(start..end);
-                        let displacement = Vec2::from_angle(angle) * distance;
-                        hit_evt.position + displacement.extend(0.0)
-                    }
-                };
-
-                spawn_asteroid_from_pool(
-                    GameState::Playing,
-                    Some(**playstate),
-                    playing_field,
-                    position,
-                    pool,
-                    None,
-                    &asteroid_spritesheets,
-                    &mut rand,
-                    &mut commands,
-                );
+            AsteroidHitBehavior::Points(points) => {
+                add_to_score(*points, &hit_evt.players, &mut score_events);
             }
-            add_to_score(*points, &hit_evt.players, &mut score_events);
+
+            AsteroidHitBehavior::Split { count, select_from } => {
+                for _ in match count {
+                    AsteroidSplitCount::Exact(max) => 0..*max,
+                    AsteroidSplitCount::Range { start, end } => 0..rand.usize(start..end),
+                } {
+                    let Some(pool) =
+                        select_from.pick_random_pool(&mut rand, &asteroid_pool_collection)
+                    else {
+                        warn!("did not find an asteroid pool");
+                        continue;
+                    };
+
+                    let position = match &pool.displacement {
+                        AsteroidDisplacement::None => hit_evt.position,
+                        AsteroidDisplacement::Exact(distance) => {
+                            let angle = rand.f32_range(0.0..TAU);
+                            let displacement = Vec2::from_angle(angle) * *distance;
+                            hit_evt.position + displacement.extend(0.0)
+                        }
+                        AsteroidDisplacement::Range { start, end } => {
+                            let angle = rand.f32_range(0.0..TAU);
+                            let distance = rand.f32_range(start..end);
+                            let displacement = Vec2::from_angle(angle) * distance;
+                            hit_evt.position + displacement.extend(0.0)
+                        }
+                    };
+
+                    spawn_asteroid_from_pool(
+                        GameState::Playing,
+                        Some(**playstate),
+                        playing_field,
+                        position,
+                        pool,
+                        None,
+                        &asteroid_spritesheets,
+                        &mut rand,
+                        &mut commands,
+                    );
+                }
+            }
+
+            AsteroidHitBehavior::Despawn => {
+                remove_events.send(AsteroidRemoveEvent { asteroid });
+            }
+
+            AsteroidHitBehavior::Audio(audio) => {
+                commands.spawn((
+                    SpatialBundle {
+                        transform: Transform::from_translation(hit_evt.position),
+                        ..default()
+                    },
+                    AudioBundle {
+                        source: asset_server.load(audio),
+                        settings: PlaybackSettings {
+                            volume: Volume::new(1.0),
+                            spatial: true,
+                            ..PlaybackSettings::DESPAWN
+                        },
+                    },
+                ));
+            }
         }
     }
-
-    // Remove the original asteroid
-    remove_events.send(AsteroidRemoveEvent { asteroid });
 }
 
 // region: general functions
@@ -389,8 +407,8 @@ fn spawn_asteroid_from_pool(
                     index
                 };
 
-                let speed = speed.unwrap_or(pool.speed);
-                let rotation = rotation.unwrap_or(pool.rotation);
+                let speed = speed.unwrap_or(pool.velocity);
+                let rotation = rotation.unwrap_or(pool.angular_velocity);
                 (spritesheet.clone(), atlas_index, speed, rotation)
             }
         }
