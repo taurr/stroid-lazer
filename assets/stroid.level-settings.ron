@@ -4,6 +4,7 @@
         //    spawn_position: (0, 0),
         //    safe_radius: 100,
         //),
+        background: "backgrounds/earth-1756274_1920.jpg",
         startup: (
             asteroids: (
                 count: Exact(5),
@@ -15,6 +16,7 @@
         next_level: "Rookie",
     ),
     "Rookie": (
+        background: "backgrounds/planet-581239_1280.jpg",
         startup: (
             asteroids: (
                 count: Exact(7),
@@ -27,6 +29,7 @@
         next_level: "Yiihaaa!!!",
     ),
     "Yiihaaa!!!": (
+        background: "backgrounds/planets-5923806_1920.jpg",
         startup: (
             asteroids: (
                 count: Exact(10),
