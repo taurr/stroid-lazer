@@ -111,11 +111,16 @@ impl Plugin for GameStatesPlugin {
         )
         .add_systems(
             Update,
-            (start_next_level, init_level_settings)
-                .chain()
+            start_next_level
                 .run_if(in_state(PlayState::StartNextLevel))
                 .in_set(GameStatesSet),
         )
+        .add_systems(
+            OnExit(PlayState::StartNextLevel),
+            init_level_settings
+                .in_set(GameStatesSet),
+        )
+
         .add_systems(
             OnEnter(PlayState::Running),
             resume_movement.in_set(GameStatesSet),
@@ -203,19 +208,22 @@ fn setup_camera_and_playing_field(
             random_generator,
         ))
         .with_children(|commands| {
-            commands.spawn(SpriteBundle {
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(game_area.width(), game_area.height())),
-                    color: Color::srgb(0.0, 0.0, 0.2),
+            // Place a background behind the PlayingField.
+            commands.spawn((
+                Background,
+                SpriteBundle {
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(game_area.width(), game_area.height())),
+                        ..default()
+                    },
+                    transform: Transform::from_translation(Vec3::new(
+                        0.0,
+                        0.0,
+                        PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS,
+                    )),
                     ..default()
                 },
-                transform: Transform::from_translation(Vec3::new(
-                    0.0,
-                    0.0,
-                    PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS,
-                )),
-                ..default()
-            });
+            ));
             // Add an entity for displaying a border around the PlayingField.
             // The border helps us hide game elements as they move out or into the game-area,
             // especially in a situation where the window is scaled such that we have an empty
@@ -294,6 +302,8 @@ pub fn init_level_settings(
     current_level: Res<GameLevel>,
     level_settings_collection: Res<GameLevelSettingsCollection>,
     default_level_settings: Res<DefaultLevelSettings>,
+    background_query: Query<Entity, With<Background>>,
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
     let Some(level_settings) = level_settings_collection.get(&**current_level) else {
@@ -316,7 +326,19 @@ pub fn init_level_settings(
     );
     commands.insert_resource(player_settings);
     commands.insert_resource(level_settings.clone());
+
+    debug!(
+        background = &level_settings.background,
+        "loading background image"
+    );
+    let background: Handle<Image> = asset_server.load(&level_settings.background);
+    commands
+        .entity(background_query.single())
+        .insert(background);
 }
+
+#[derive(Debug, Clone, Component)]
+pub struct Background;
 
 /// Initialize [GameLevel] to the correct starting level.
 #[cfg(feature = "cmd_line")]
@@ -369,7 +391,7 @@ fn start_next_level(
     mut next: ResMut<NextState<PlayState>>,
 ) {
     if projectiles.iter().count() == 0 {
-        info!("starting next level");
+        info!("no more projectiles, starting next level");
         next.set(PlayState::CountdownBeforeRunning);
     }
 }

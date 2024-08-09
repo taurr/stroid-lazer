@@ -13,7 +13,7 @@ ron = "0.8.1"
 tracing = "0.1.40"
 anyhow = "1.0.86"
 
-bevy = { version = "0.14.1", features = ["bevy_dev_tools"] }
+bevy = { version = "0.14.1", features = ["bevy_dev_tools", "jpeg"] }
 bevy_asset_loader = { version = "0.21.0", features = [
     "2d",
     "standard_dynamic_assets",
@@ -44,7 +44,7 @@ opt-level = 0
 opt-level = 3
 
 [features]
-default = ["cmd_line", ]
+default = [ "cmd_line" ]
 
 cmd_line = ["clap"]
 dbg_colliders = [] # show colliders

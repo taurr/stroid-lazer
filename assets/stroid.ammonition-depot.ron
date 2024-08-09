@@ -4,15 +4,15 @@
         speed: 1000.0,
         timeout: (
             secs: 0,
-            nanos: 650000000,
+            nanos: 325000000,
         ),
     ),
     "green-fast-laser": (
         texture_key: "green-ammonition-gfx",
         speed: 2000.0,
         timeout: (
-            secs: 1,
-            nanos: 500000000,
+            secs: 0,
+            nanos: 650000000,
         ),
     ),
 })
