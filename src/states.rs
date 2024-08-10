@@ -1,15 +1,17 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_asset_loader::prelude::*;
+use bevy_persistent::Persistent;
 use bevy_turborand::{GlobalRng, RngComponent};
 use tracing::instrument;
 
 use crate::{
-    assets::GameAreaSettings,
+    assets::{GameAreaSettings, HighScoreBoard},
     background::Background,
     constants::{
         PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS, PLAYINGFIELD_BORDER_RELATIVE_Z_POS,
         PLAYINGFIELD_POS,
     },
+    player::{Player, Score},
     PlayingField,
 };
 
@@ -66,6 +68,15 @@ impl Plugin for GameStatesPlugin {
         app.add_systems(
             OnExit(GameState::LoadingAssets),
             setup_camera_and_playing_field.in_set(GameStatesSet),
+        );
+
+        app.add_systems(
+            OnEnter(PlayState::GameOver(GameOverReason::GameWon)),
+            enter_highscore,
+        )
+        .add_systems(
+            OnEnter(PlayState::GameOver(GameOverReason::PlayerDead)),
+            enter_highscore,
         );
     }
 }
@@ -180,4 +191,22 @@ fn setup_camera_and_playing_field(
 
     #[cfg(feature = "perf")]
     commands.spawn(iyes_perf_ui::prelude::PerfUiCompleteBundle::default());
+}
+
+fn enter_highscore(
+    score_query: Query<&Score, With<Player>>,
+    mut highscores: ResMut<Persistent<HighScoreBoard>>,
+) {
+    if let Ok(score) = score_query.get_single() {
+        if **score > 0 {
+            highscores
+                .update(|highscores| {
+                    if let Some(key) = highscores.add_score(*score) {
+                        highscores.assign_name("tester", key);
+                        warn!(?score, "Highscore added");
+                    };
+                })
+                .expect("failed to update highscores");
+        }
+    }
 }

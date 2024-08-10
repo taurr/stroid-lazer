@@ -1,5 +1,6 @@
 use bevy::prelude::*;
-use derive_more::{Debug, Deref, DerefMut, Display, Constructor};
+use derive_more::{Constructor, Debug, Deref, DerefMut, Display};
+use serde::{Deserialize, Serialize};
 
 #[derive(Component, Debug, Clone, Copy)]
 pub struct Player {
@@ -9,7 +10,23 @@ pub struct Player {
 #[derive(Component, Debug, Clone, Copy)]
 pub struct PlayerSprite;
 
-#[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone, Copy)]
+#[derive(
+    Component,
+    Reflect,
+    Debug,
+    Display,
+    Deref,
+    DerefMut,
+    Constructor,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+)]
 pub struct Score(usize);
 
 #[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone)]

@@ -12,6 +12,7 @@ serde = { version = "1.0.205" }
 ron = "0.8.1"
 tracing = "0.1.40"
 anyhow = "1.0.86"
+uuid = { version = "1.10.0", features = ["v7"] }
 
 bevy = { version = "0.14.1", features = ["bevy_dev_tools", "jpeg"] }
 bevy_asset_loader = { version = "0.21.0", features = [
@@ -27,7 +28,8 @@ bevy_tweening = "0.11.0"
 bevy-inspector-egui = { version = "0.25.1", optional = true }
 bevy_editor_pls = { version = "0.8.1", optional = true }
 iyes_perf_ui = { version = "0.3.0", optional = true }
-clap = { version = "4.5.14", features = ["derive"], optional = true }
+clap = { version = "4.5.15", features = ["derive"], optional = true }
+bevy-persistent = { version = "0.6.0", features = ["ron"] }
 
 [dev-dependencies]
 rstest = "0.22.0"
@@ -37,7 +39,8 @@ type_complexity = "allow"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
-opt-level = 0
+opt-level = 1
+incremental = false
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
+use bevy_persistent::{Persistent, StorageFormat};
 
 use crate::states::GameState;
 
@@ -8,8 +9,8 @@ use super::{
     game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
     AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
     AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings, GameLevelSettingsCollection,
-    GameSettings, GameStartSettings, InputKeySettings, SpriteSheetAsset, StateBackgrounds,
-    TextureCount, WeaponCollection,
+    GameSettings, GameStartSettings, HighScoreBoard, InputKeySettings, SpriteSheetAsset,
+    StateBackgrounds, TextureCount, WeaponCollection,
 };
 
 pub struct GameAssetsPlugin;
@@ -19,6 +20,18 @@ pub struct GameAssetsPlugin;
 
 impl Plugin for GameAssetsPlugin {
     fn build(&self, app: &mut App) {
+        app.add_systems(Startup, |mut commands: Commands| {
+            commands.insert_resource(
+                Persistent::<HighScoreBoard>::builder()
+                    .name("high-scores")
+                    .format(StorageFormat::Ron)
+                    .path("highscores.ron")
+                    .default(HighScoreBoard::default())
+                    .build()
+                    .expect("failed to initialize high-scores"),
+            );
+        });
+
         // register assets for debug
         app.register_type::<AsteroidPoolCollection>()
             .register_type::<GameSettings>()
