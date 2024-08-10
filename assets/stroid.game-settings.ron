@@ -12,6 +12,7 @@
             secs: 3,
             nanos: 0,
         ),
+        new_life_every: 10000,
     ),
     level_defaults: (
         player: (

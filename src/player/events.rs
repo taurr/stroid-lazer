@@ -17,3 +17,6 @@ pub(crate) struct PlayerJumpingEvent;
 
 #[derive(Debug, Clone, Event)]
 pub(crate) struct PlayerJumpFinishedEvent;
+
+#[derive(Debug, Clone, Event)]
+pub(crate) struct NewLife;

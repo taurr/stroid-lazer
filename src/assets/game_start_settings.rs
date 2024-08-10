@@ -13,6 +13,7 @@ pub struct GameStartSettings {
     pub weapon_key: String,
     pub countdown_duration: Duration,
     pub minimum_countdown_duration: Duration,
+    pub new_life_every: usize,
 }
 
 impl FromWorld for GameStartSettings {
