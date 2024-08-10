@@ -1,6 +1,8 @@
 use avian2d::PhysicsPlugins;
 use bevy::prelude::*;
 
+use crate::states::PlayState;
+
 use super::{
     systems::*, ClampMovementSpeed, GameArea, PausedAngularVelocity, PausedLinearVelocity,
     WrappingGameAreaOn,
@@ -32,6 +34,14 @@ impl Plugin for MovementPlugin {
                 pause_movement,
             )
                 .in_set(MovementSet),
+        )
+        .add_systems(
+            OnExit(PlayState::Running),
+            auto_pause_movement_when_not_playing.in_set(MovementSet),
+        )
+        .add_systems(
+            OnEnter(PlayState::Running),
+            auto_resume_movement_when_playing.in_set(MovementSet),
         );
     }
 }

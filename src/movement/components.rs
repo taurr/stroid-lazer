@@ -6,9 +6,14 @@ use derive_more::{Constructor, Deref, DerefMut, From, Into};
 use serde::{Deserialize, Serialize};
 use smart_default::SmartDefault;
 
-/// A component that clamps the movement speed of a [LinearVelocity] to a given range.
+/// When put on an [Entity] it cause the entity to temporarily
+/// loose it's [LinearVelocity] and [AngularVelocity], thus pausing movement.
 #[derive(Component, Reflect, Debug, Clone)]
-pub struct MovementPaused;
+pub struct PauseMovement;
+
+/// Component added to entities that we've pause automatically when leaving the [PlayState::Running] state.
+#[derive(Component, Reflect, Debug, Clone)]
+pub(super) struct AutoMovementPaused;
 
 /// A component that clamps the movement speed of a [LinearVelocity] to a given range.
 #[derive(Component, Reflect, Debug, Clone, Constructor, SmartDefault)]
@@ -24,20 +29,14 @@ pub struct PausedLinearVelocity(pub LinearVelocity);
 pub struct PausedAngularVelocity(pub AngularVelocity);
 
 /// Describes a game area for constraining movement using the [Wrapping] component.
+///
+/// Any [Entity] that has a [Wrapping] component must also have a [GameArea]
+/// component in the hierarchy.
 #[derive(Component, Reflect, Debug, Clone, Deserialize, Serialize)]
 pub struct GameArea {
     pub min: Vec3,
     pub max: Vec3,
 }
-
-/// A component that makes sure an entity is within a [GameArea].
-///
-/// Either the entity itself, or one of its parents must have a [GameArea] component.
-#[derive(Component, Debug, Clone, Constructor)]
-pub struct Wrapping;
-
-#[derive(Component, Reflect, Debug, Clone, Deref, Constructor)]
-pub(super) struct WrappingGameAreaOn(Entity);
 
 impl GameArea {
     pub fn new(min: Vec3, max: Vec3) -> Self {
@@ -82,3 +81,13 @@ impl GameArea {
         ))
     }
 }
+
+/// A component that makes sure an entity is within a [GameArea].
+///
+/// Either the entity itself, or one of its parents must have a [GameArea] component.
+#[derive(Component, Debug, Clone, Constructor)]
+pub struct Wrapping;
+
+/// A component pointing to the entity has the [GameArea] component.
+#[derive(Component, Reflect, Debug, Clone, Deref, Constructor)]
+pub(super) struct WrappingGameAreaOn(Entity);

@@ -5,7 +5,7 @@ use super::{
     input::{accept_player_input, PlayerAction},
     *,
 };
-use crate::{states::GameStatesSet, PlayState};
+use crate::{levels::GameLevelsSet, PlayState};
 
 pub struct PlayerPlugin;
 
@@ -30,17 +30,17 @@ impl Plugin for PlayerPlugin {
             )
                 .chain()
                 .in_set(PlayerSet)
-                .after(GameStatesSet),
+                .after(GameLevelsSet),
         )
         .add_systems(
             OnExit(PlayState::StartNextLevel),
             reset_player_movement_system
                 .in_set(PlayerSet)
-                .after(GameStatesSet),
+                .after(GameLevelsSet),
         )
         .add_systems(
             OnExit(PlayState::StartAfterDeath),
-            clear_safe_radius.in_set(PlayerSet).after(GameStatesSet),
+            clear_safe_radius.in_set(PlayerSet).after(GameLevelsSet),
         )
         .add_systems(
             OnEnter(PlayState::Running),

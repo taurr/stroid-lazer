@@ -1,22 +1,16 @@
-use avian2d::prelude::{AngularVelocity, LinearVelocity};
-use bevy::{prelude::*, render::camera::ScalingMode, window::PrimaryWindow};
+use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_asset_loader::prelude::*;
 use bevy_turborand::{GlobalRng, RngComponent};
 use tracing::instrument;
 
 use crate::{
-    assets::{
-        DefaultLevelSettings, GameAreaSettings, GameLevelSettings, GameLevelSettingsCollection,
-        GameStartSettings, StateBackgrounds,
-    },
-    asteroid::AsteroidCount,
+    assets::GameAreaSettings,
+    background::Background,
     constants::{
         PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS, PLAYINGFIELD_BORDER_RELATIVE_Z_POS,
         PLAYINGFIELD_POS,
     },
-    movement::MovementPaused,
-    projectile::Projectile,
-    GameLevel, PlayingField,
+    PlayingField,
 };
 
 /// General states of the game.
@@ -61,118 +55,18 @@ impl Plugin for GameStatesPlugin {
             .add_sub_state::<PlayState>()
             .enable_state_scoped_entities::<GameState>()
             .enable_state_scoped_entities::<PlayState>()
-            .add_systems(
-                Last,
-                (
-                    bevy::dev_tools::states::log_transitions::<GameState>,
-                    bevy::dev_tools::states::log_transitions::<PlayState>,
-                ),
+            .add_loading_state(
+                #[cfg(feature = "dbg_colliders")]
+                LoadingState::new(GameState::LoadingAssets)
+                    .continue_to_state(GameState::DebugColliders),
+                #[cfg(not(feature = "dbg_colliders"))]
+                LoadingState::new(GameState::LoadingAssets).continue_to_state(GameState::MainMenu),
             );
-
-        // add the loading state for the game - done here as we need to configure where it goes
-        // once assets has been loaded.
-        app.add_loading_state(
-            #[cfg(feature = "dbg_colliders")]
-            LoadingState::new(GameState::LoadingAssets)
-                .continue_to_state(GameState::DebugColliders),
-            #[cfg(not(feature = "dbg_colliders"))]
-            LoadingState::new(GameState::LoadingAssets).continue_to_state(GameState::MainMenu),
-        );
-
-        app.add_systems(
-            PreUpdate,
-            set_state_background
-                .run_if(
-                    not(in_state(GameState::LoadingAssets))
-                        .and_then(state_changed::<GameState>.or_else(state_changed::<PlayState>)),
-                )
-                .in_set(GameStatesSet),
-        );
-        #[cfg(feature = "cmd_line")]
-        app.add_systems(
-            Update,
-            (|args: Res<crate::args::Args>,
-              mut next: ResMut<NextState<GameState>>,
-              mut has_run: Local<bool>| {
-                if !*has_run && args.play {
-                    *has_run = true;
-                    next.set(GameState::Playing);
-                }
-            })
-            .run_if(in_state(GameState::MainMenu))
-            .in_set(GameStatesSet),
-        );
 
         app.add_systems(
             OnExit(GameState::LoadingAssets),
             setup_camera_and_playing_field.in_set(GameStatesSet),
-        )
-        .add_systems(
-            OnEnter(PlayState::StartNewGame),
-            (start_new_game, init_level_settings)
-                .chain()
-                .in_set(GameStatesSet),
-        )
-        .add_systems(
-            Update,
-            start_after_death
-                .run_if(in_state(PlayState::StartAfterDeath))
-                .in_set(GameStatesSet),
-        )
-        .add_systems(
-            Update,
-            start_next_level
-                .run_if(in_state(PlayState::StartNextLevel))
-                .in_set(GameStatesSet),
-        )
-        .add_systems(
-            OnExit(PlayState::StartNextLevel),
-            init_level_settings.in_set(GameStatesSet),
-        )
-        .add_systems(
-            OnEnter(PlayState::Running),
-            resume_movement.in_set(GameStatesSet),
-        )
-        .add_systems(
-            Update,
-            pause_when_window_looses_focus.run_if(in_state(GameState::Playing)),
-        )
-        .add_systems(
-            PostUpdate,
-            detect_level_cleared
-                .run_if(in_state(PlayState::Running))
-                .in_set(GameStatesSet),
-        )
-        .add_systems(
-            OnExit(PlayState::Running),
-            pause_movement.in_set(GameStatesSet),
         );
-    }
-}
-
-/// Component added to entities that we've pause automatically when leaving the [PlayState::Running] state.
-#[derive(Component, Reflect, Debug, Clone)]
-struct MovementAutoPaused;
-
-/// Pauses all movement and rotation by temporarily inserting a [MovementPaused] component,
-/// and adding the [MovementAutoPaused] component.
-fn pause_movement(
-    query: Query<
-        Entity,
-        (
-            Without<MovementPaused>,
-            Without<Projectile>,
-            Or<(With<LinearVelocity>, With<AngularVelocity>)>,
-        ),
-    >,
-    mut commands: Commands,
-) {
-    for entity in query.iter() {
-        debug!(?entity, "pausing movement");
-        commands
-            .entity(entity)
-            .insert(MovementPaused)
-            .insert(MovementAutoPaused);
     }
 }
 
@@ -286,196 +180,4 @@ fn setup_camera_and_playing_field(
 
     #[cfg(feature = "perf")]
     commands.spawn(iyes_perf_ui::prelude::PerfUiCompleteBundle::default());
-}
-
-/// Resumes movement and rotation from all [Entity]s that have the [MovementAutoPaused] component by
-/// removing the [MovementPaused] and [MovementAutoPaused] components.
-fn resume_movement(query: Query<Entity, With<MovementAutoPaused>>, mut commands: Commands) {
-    for entity in query.iter() {
-        debug!(?entity, "resuming movement");
-        commands
-            .entity(entity)
-            .remove::<MovementPaused>()
-            .remove::<MovementAutoPaused>();
-    }
-}
-
-fn set_state_background(
-    game_state: Res<State<GameState>>,
-    play_state: Option<Res<State<PlayState>>>,
-    background_query: Query<Entity, With<Background>>,
-    backgrounds: Res<StateBackgrounds>,
-    mut commands: Commands,
-) {
-    let background = match **game_state {
-        GameState::LoadingAssets => None,
-        GameState::MainMenu => Some(backgrounds.main_menu.clone()),
-        GameState::Playing => match **play_state.unwrap() {
-            PlayState::StartNewGame => None,
-            PlayState::StartAfterDeath => None,
-            PlayState::StartNextLevel => None,
-            PlayState::CountdownBeforeRunning => None,
-            PlayState::Running => None,
-            PlayState::Paused => None,
-            PlayState::GameOver(reason) => match reason {
-                GameOverReason::PlayerDead => Some(backgrounds.game_over.clone()),
-                GameOverReason::GameWon => Some(backgrounds.game_won.clone()),
-            },
-        },
-    };
-
-    if let Some(background) = background {
-        commands
-            .entity(background_query.single())
-            .insert(background);
-    }
-}
-
-/// Reads the current level from the [GameLevel] resource and looks up the [GameLevelSettings] to
-/// insert it, and a [PlayerSettings] as resources.
-///
-/// This wastes a little bit of memory, but saves us from looking up and merging settings every
-/// time we need them during the gameplay.
-#[instrument(skip_all)]
-pub fn init_level_settings(
-    current_level: Res<GameLevel>,
-    level_settings_collection: Res<GameLevelSettingsCollection>,
-    default_level_settings: Res<DefaultLevelSettings>,
-    background_query: Query<Entity, With<Background>>,
-    asset_server: Res<AssetServer>,
-    mut commands: Commands,
-) {
-    let Some(level_settings) = level_settings_collection.get(&**current_level) else {
-        error!(
-            level = &**current_level,
-            "Settings are flawed: Unrecognized level specified"
-        );
-        panic!();
-    };
-
-    let player_settings = default_level_settings
-        .player
-        .clone()
-        .merge(level_settings.player.as_ref());
-
-    debug!(
-        ?player_settings,
-        ?level_settings,
-        "inserting PlayerSettings & LevelSettings as resources"
-    );
-    commands.insert_resource(player_settings);
-    commands.insert_resource(level_settings.clone());
-
-    debug!(
-        background = &level_settings.background,
-        "loading background image"
-    );
-    let background: Handle<Image> = asset_server.load(&level_settings.background);
-    commands
-        .entity(background_query.single())
-        .insert(background);
-}
-
-#[derive(Debug, Clone, Component)]
-pub struct Background;
-
-/// Initialize [GameLevel] to the correct starting level.
-#[cfg(feature = "cmd_line")]
-#[instrument(skip_all)]
-fn start_new_game(
-    mut current_level: ResMut<GameLevel>,
-    args: Res<crate::args::Args>,
-    game_start: Res<GameStartSettings>,
-    mut next: ResMut<NextState<PlayState>>,
-) {
-    **current_level = args
-        .level
-        .as_ref()
-        .cloned()
-        .unwrap_or_else(|| game_start.level.clone());
-
-    info!(level = **current_level, "Starting new game");
-    next.set(PlayState::CountdownBeforeRunning);
-}
-
-/// Initialize [GameLevel] to the correct starting level.
-#[cfg(not(feature = "cmd_line"))]
-#[instrument(skip_all)]
-fn start_new_game(
-    mut next: ResMut<NextState<PlayState>>,
-    mut level: ResMut<GameLevel>,
-    game_start: Res<GameStartSettings>,
-) {
-    **level = game_start.level;
-    info!(level = **level, "Starting new game");
-    next.set(PlayState::CountdownBeforeRunning);
-}
-
-/// Currently, just go directly to the countdown state.
-#[instrument(skip_all)]
-fn start_after_death(
-    projectiles: Query<Entity, With<Projectile>>,
-    mut next: ResMut<NextState<PlayState>>,
-) {
-    if projectiles.is_empty() {
-        info!("restarting after death");
-        next.set(PlayState::CountdownBeforeRunning);
-    }
-}
-
-/// Currently, just go directly to the countdown state.
-#[instrument(skip_all)]
-fn start_next_level(
-    projectiles: Query<Entity, With<Projectile>>,
-    mut next: ResMut<NextState<PlayState>>,
-) {
-    if projectiles.iter().count() == 0 {
-        info!("no more projectiles, starting next level");
-        next.set(PlayState::CountdownBeforeRunning);
-    }
-}
-
-/// Detects when all asteroids have been destroyed, and all projectiles are gone, then transitions
-/// to either [PlayState::GameOver] or [PlayState::StartNextLevel] depending on the current level.
-#[instrument(skip_all)]
-fn detect_level_cleared(
-    asteroid_counter: Res<AsteroidCount>,
-    level_settings: Res<GameLevelSettings>,
-    mut current_level: ResMut<GameLevel>,
-    mut next: ResMut<NextState<PlayState>>,
-) {
-    if **asteroid_counter == 0 {
-        //if let Ok(player) = player.get_single() {
-        //    commands.entity(player).insert(MovementPaused);
-        //}
-        let Some(next_level) = &level_settings.next_level else {
-            warn!("won the game!");
-            next.set(PlayState::GameOver(GameOverReason::GameWon));
-            return;
-        };
-
-        info!(next_level, "level cleared, starting next level");
-        **current_level = next_level.clone();
-        next.set(PlayState::StartNextLevel);
-    }
-}
-
-/// Whenever the primary window looses focus, transitions to [PlayState::Paused].
-#[instrument(skip_all)]
-fn pause_when_window_looses_focus(
-    query: Query<&Window, With<PrimaryWindow>>,
-    state: Res<State<PlayState>>,
-    mut next_state: ResMut<NextState<PlayState>>,
-) {
-    if let Ok(window) = query.get_single() {
-        match (state.get(), window.focused) {
-            (PlayState::CountdownBeforeRunning, false) => {
-                next_state.set(PlayState::Paused);
-            }
-            (PlayState::Running, false) => {
-                next_state.set(PlayState::Paused);
-            }
-            (_, _) => {}
-        }
-    }
 }

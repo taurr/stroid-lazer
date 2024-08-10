@@ -7,12 +7,11 @@ use bevy_turborand::prelude::RngPlugin;
 use bevy_tweening::TweeningPlugin;
 use derive_more::{Deref, DerefMut};
 
-#[cfg(feature = "cmd_line")]
-mod args;
-
 mod assets;
 mod asteroid;
+mod background;
 mod constants;
+mod levels;
 mod movement;
 mod player;
 mod projectile;
@@ -24,7 +23,9 @@ mod utils;
 use self::{
     assets::GameAssetsPlugin,
     asteroid::AsteroidPlugin,
+    background::BackgroundPlugin,
     constants::AUDIO_SCALE,
+    levels::GameLevelsPlugin,
     movement::MovementPlugin,
     player::PlayerPlugin,
     projectile::ProjectilePlugin,
@@ -50,7 +51,6 @@ fn main() -> AppExit {
     let mut app = App::new();
 
     app.init_resource::<GameLevel>()
-        .insert_resource(ClearColor(bevy::color::palettes::css::BLACK.into()))
         .add_plugins(
             DefaultPlugins
                 .set(AudioPlugin {
@@ -76,6 +76,7 @@ fn main() -> AppExit {
 
     app.add_plugins((
         GameStatesPlugin,
+        GameLevelsPlugin,
         GameAssetsPlugin,
         TweenCompletedPlugin,
         MovementPlugin,
@@ -83,16 +84,23 @@ fn main() -> AppExit {
         ProjectilePlugin,
         AsteroidPlugin,
         UiPlugin,
+        BackgroundPlugin,
     ));
 
     add_features(&mut app);
     app.run()
 }
 
+#[cfg(feature = "cmd_line")]
+mod cmd_line;
+
 #[allow(unused)]
 fn add_features(app: &mut App) {
     #[cfg(feature = "cmd_line")]
-    app.insert_resource(<args::Args as clap::Parser>::parse());
+    app.add_plugins(self::cmd_line::CmdLinePlugin);
+
+    #[cfg(feature = "dbg_colliders")]
+    app.add_plugins(PhysicsDebugPlugin::default());
 
     #[cfg(feature = "inspector")]
     app.add_plugins((
@@ -100,9 +108,6 @@ fn add_features(app: &mut App) {
         //bevy_inspector_egui::quick::AssetInspectorPlugin::<assets::SpriteSheet>::default(),
         //ResourceInspectorPlugin::<AsteroidAssets>::default(),
     ));
-
-    #[cfg(feature = "dbg_colliders")]
-    app.add_plugins(PhysicsDebugPlugin::default());
 
     #[cfg(feature = "editor")]
     app.add_plugins(bevy_editor_pls::EditorPlugin::default());
@@ -114,4 +119,12 @@ fn add_features(app: &mut App) {
         bevy::diagnostic::SystemInformationDiagnosticsPlugin,
         iyes_perf_ui::PerfUiPlugin,
     ));
+
+    app.add_systems(
+        Last,
+        (
+            bevy::dev_tools::states::log_transitions::<GameState>,
+            bevy::dev_tools::states::log_transitions::<PlayState>,
+        ),
+    );
 }

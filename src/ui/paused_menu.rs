@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
 use tracing::instrument;
 
 use crate::{
@@ -18,41 +18,34 @@ pub enum PausedButton {
 }
 impl InteractionId for PausedButton {}
 
-fn init_pause_countdown_timer(game_start: Res<GameStartSettings>, mut commands: Commands) {
-    commands.insert_resource(CountdownTimer::with_duration(
-        game_start.minimum_countdown_duration,
-    ));
-}
+#[derive(Event)]
+struct ResumeEvent;
+
+#[derive(Event)]
+struct PauseEvent;
 
 pub fn build_ui(app: &mut App) {
-    let state = PlayState::Paused;
-
-    app.add_systems(OnEnter(state), spawn_ui)
-        .add_interaction_handler_in_state::<PausedButton>(state)
+    app.add_systems(OnEnter(PlayState::Paused), spawn_ui)
+        .add_interaction_handler_in_state::<PausedButton>(PlayState::Paused)
         .add_systems(
             Update,
-            wait_for_esc_to_pause.run_if(in_state(PlayState::Running)),
-        )
-        .add_systems(
-            OnTransition {
-                exited: PlayState::Running,
-                entered: PlayState::Paused,
-            },
-            init_pause_countdown_timer,
+            (|mut commands: Commands| commands.trigger(PauseEvent)).run_if(
+                (in_state(PlayState::CountdownBeforeRunning).or_else(in_state(PlayState::Running)))
+                    .and_then(not(window_has_focus).or_else(pause_key_pressed)),
+            ),
         )
         .add_systems(
             Update,
-            wait_for_esc_to_pause.run_if(in_state(PlayState::CountdownBeforeRunning)),
+            (|mut commands: Commands| commands.trigger(ResumeEvent))
+                .run_if(in_state(PlayState::Paused).and_then(pause_key_pressed)),
         )
         .add_systems(
             Update,
-            (
-                highlight_interaction::<PausedButton>,
-                handle_paused_menu,
-                wait_for_esc_to_continue,
-            )
-                .run_if(in_state(state)),
-        );
+            (highlight_interaction::<PausedButton>, handle_paused_menu)
+                .run_if(in_state(PlayState::Paused)),
+        )
+        .observe(on_resume_event)
+        .observe(on_pause_event);
 }
 
 #[instrument(skip_all)]
@@ -86,65 +79,60 @@ fn spawn_ui(mut commands: Commands) {
     commands.entity(menu).insert_children(0, &[headline]);
 }
 
-fn handle_paused_menu(
-    mut event: EventReader<PressedEvent<PausedButton>>,
-    mut play_state: ResMut<NextState<PlayState>>,
-    timer: Res<CountdownTimer>,
-    game_start: Res<GameStartSettings>,
-    mut commands: Commands,
-) {
+fn handle_paused_menu(mut event: EventReader<PressedEvent<PausedButton>>, mut commands: Commands) {
     for PressedEvent { id, entity: _ } in event.read() {
         match id {
             PausedButton::Continue => {
-                match timer.remaining() {
-                    Some(remaining) if remaining < game_start.minimum_countdown_duration => {
-                        commands.insert_resource(CountdownTimer::with_duration(
-                            game_start.minimum_countdown_duration,
-                        ));
-                    }
-                    _ => {}
-                };
-                play_state.set(PlayState::CountdownBeforeRunning);
+                commands.trigger(ResumeEvent);
             }
         }
     }
 }
 
-fn wait_for_esc_to_continue(
-    keys: Res<ButtonInput<KeyCode>>,
-    input_settings: Res<InputKeySettings>,
-    mut next: ResMut<NextState<PlayState>>,
-) {
-    for key in keys.get_just_pressed() {
-        debug!(?key, "was pressed");
-        if *key == input_settings.pause {
-            info!("Continuing");
-            next.set(PlayState::CountdownBeforeRunning);
-        }
-    }
-}
-
-fn wait_for_esc_to_pause(
-    keys: Res<ButtonInput<KeyCode>>,
-    input_settings: Res<InputKeySettings>,
-    mut next: ResMut<NextState<PlayState>>,
+fn on_resume_event(
+    _trigger: Trigger<ResumeEvent>,
+    mut play_state: ResMut<NextState<PlayState>>,
     timer: Res<CountdownTimer>,
     game_start: Res<GameStartSettings>,
     mut commands: Commands,
 ) {
+    match timer.remaining() {
+        None => {
+            commands.insert_resource(CountdownTimer::with_duration(
+                game_start.minimum_countdown_duration,
+            ));
+        }
+        Some(remaining) if remaining < game_start.minimum_countdown_duration => {
+            commands.insert_resource(CountdownTimer::with_duration(
+                game_start.minimum_countdown_duration,
+            ));
+        }
+        _ => {}
+    };
+    play_state.set(PlayState::CountdownBeforeRunning);
+}
+
+fn on_pause_event(_trigger: Trigger<PauseEvent>, mut next_state: ResMut<NextState<PlayState>>) {
+    next_state.set(PlayState::Paused);
+}
+
+fn window_has_focus(query: Query<&Window, With<PrimaryWindow>>) -> bool {
+    if let Ok(window) = query.get_single() {
+        window.focused
+    } else {
+        false
+    }
+}
+
+fn pause_key_pressed(
+    keys: Res<ButtonInput<KeyCode>>,
+    input_settings: Res<InputKeySettings>,
+) -> bool {
     for key in keys.get_just_pressed() {
-        debug!(?key, "was pressed");
         if *key == input_settings.pause {
-            match timer.remaining() {
-                Some(remaining) if remaining < game_start.minimum_countdown_duration => {
-                    commands.insert_resource(CountdownTimer::with_duration(
-                        game_start.minimum_countdown_duration,
-                    ));
-                }
-                _ => {}
-            };
-            warn!("Pausing");
-            next.set(PlayState::Paused);
+            debug!(?key, "pause key pressed");
+            return true;
         }
     }
+    false
 }

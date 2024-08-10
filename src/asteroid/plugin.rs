@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use smart_default::SmartDefault;
 
-use crate::{states::GameStatesSet, PlayState};
+use crate::{levels::GameLevelsSet, PlayState};
 
 use super::*;
 
@@ -28,14 +28,14 @@ impl Plugin for AsteroidPlugin {
             )
                 .chain()
                 .in_set(AsteroidSet)
-                .after(GameStatesSet),
+                .after(GameLevelsSet),
         )
         .add_systems(
             OnExit(PlayState::StartNextLevel),
             (init_asteroid_counter, spawn_level_asteroids)
                 .chain()
                 .in_set(AsteroidSet)
-                .after(GameStatesSet),
+                .after(GameLevelsSet),
         )
         .add_systems(
             OnEnter(PlayState::Running),

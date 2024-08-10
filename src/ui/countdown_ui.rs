@@ -4,7 +4,7 @@ use bevy::{color::palettes::css, prelude::*};
 use tracing::instrument;
 
 use crate::{
-    assets::GameStartSettings, states::GameStatesSet, ui::constants::BACKDROP_COLOR, GameLevel,
+    assets::GameStartSettings, levels::GameLevelsSet, ui::constants::BACKDROP_COLOR, GameLevel,
     PlayState,
 };
 
@@ -47,7 +47,7 @@ pub fn build_ui(app: &mut App) {
     app.init_resource::<CountdownTimer>()
         .add_systems(
             OnEnter(state),
-            setup_coundown_time.pipe(spawn_ui).after(GameStatesSet),
+            setup_coundown_time.pipe(spawn_ui).after(GameLevelsSet),
         )
         .add_systems(
             Update,

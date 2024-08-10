@@ -2,6 +2,8 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use tracing::instrument;
 
+use crate::projectile::Projectile;
+
 use super::*;
 
 pub fn wrap_rigid_bodies(
@@ -37,8 +39,8 @@ pub fn decay_linear_movement_velocity(
 
 pub fn unpause_movement(
     mut commands: Commands,
-    mut linear_query: Query<(Entity, &PausedLinearVelocity), Without<MovementPaused>>,
-    mut angular_query: Query<(Entity, &PausedAngularVelocity), Without<MovementPaused>>,
+    mut linear_query: Query<(Entity, &PausedLinearVelocity), Without<PauseMovement>>,
+    mut angular_query: Query<(Entity, &PausedAngularVelocity), Without<PauseMovement>>,
 ) {
     for (entity, velocity) in linear_query.iter_mut() {
         let velocity = velocity.0;
@@ -59,8 +61,8 @@ pub fn unpause_movement(
 
 pub fn pause_movement(
     mut commands: Commands,
-    mut linear_query: Query<(Entity, &LinearVelocity), With<MovementPaused>>,
-    mut angular_query: Query<(Entity, &AngularVelocity), With<MovementPaused>>,
+    mut linear_query: Query<(Entity, &LinearVelocity), With<PauseMovement>>,
+    mut angular_query: Query<(Entity, &AngularVelocity), With<PauseMovement>>,
 ) {
     for (entity, velocity) in linear_query.iter_mut() {
         commands
@@ -103,5 +105,42 @@ pub fn on_wrapping_added(
 
             break;
         }
+    }
+}
+
+/// Pauses all movement and rotation by temporarily inserting a [MovementPaused] component,
+/// and adding the [MovementAutoPaused] component.
+pub fn auto_pause_movement_when_not_playing(
+    query: Query<
+        Entity,
+        (
+            Without<Projectile>,
+            Without<PauseMovement>,
+            Or<(With<LinearVelocity>, With<AngularVelocity>)>,
+        ),
+    >,
+    mut commands: Commands,
+) {
+    for entity in query.iter() {
+        debug!(?entity, "pausing movement");
+        commands
+            .entity(entity)
+            .insert(PauseMovement)
+            .insert(AutoMovementPaused);
+    }
+}
+
+/// Resumes movement and rotation from all [Entity]s that have the [MovementAutoPaused] component by
+/// removing the [MovementPaused] and [MovementAutoPaused] components.
+pub fn auto_resume_movement_when_playing(
+    query: Query<Entity, With<AutoMovementPaused>>,
+    mut commands: Commands,
+) {
+    for entity in query.iter() {
+        debug!(?entity, "resuming movement");
+        commands
+            .entity(entity)
+            .remove::<PauseMovement>()
+            .remove::<AutoMovementPaused>();
     }
 }

@@ -5,6 +5,7 @@ use super::{
     interaction::*,
 };
 
+/// Changes the button color based on the interaction
 pub fn highlight_interaction<T: InteractionId + 'static>(
     mut button_event: EventReader<InteractionEvent<T>>,
     mut query: Query<&mut BackgroundColor>,

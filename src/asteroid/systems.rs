@@ -13,7 +13,7 @@ use crate::{
         GameLevelSettings, PlayerSettings,
     },
     constants::ASTEROID_Z_RANGE,
-    movement::{GameArea, MovementPaused, Wrapping},
+    movement::{GameArea, PauseMovement, Wrapping},
     player::AddToScoreEvent,
     projectile::ProjectileCollisionEvent,
     states::PlayState,
@@ -26,7 +26,7 @@ use super::*;
 #[instrument(skip_all)]
 pub fn resume_asteroid_movement(mut commands: Commands, query: Query<Entity, With<Asteroid>>) {
     for entity in query.iter() {
-        commands.entity(entity).remove::<MovementPaused>();
+        commands.entity(entity).remove::<PauseMovement>();
     }
 }
 
@@ -171,7 +171,7 @@ pub fn on_asteroid_spawn_new(
             rand,
         ));
         if event.playstate != Some(PlayState::Running) {
-            asteroid.insert(MovementPaused);
+            asteroid.insert(PauseMovement);
         }
         asteroid.insert_spritesheet(&event.spritesheet, Some(event.atlas_index), || {
             (

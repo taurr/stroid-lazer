@@ -28,7 +28,7 @@
 			"env": {
 				"RUST_LOG": "info,wgpu=warn,stroid_lazer=debug"
 			},
-			"args": ["--features", "cmd_line", "--", "--play"],
+			"args": ["--features", "cmd_line", "--", "--play"], //, "--level", "Work in progress"],
 			"isBackground": true,
 			"group": {
 				"kind": "build",

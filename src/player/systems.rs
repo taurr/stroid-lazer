@@ -19,7 +19,7 @@ use crate::{
     },
     asteroid::AsteroidSprite,
     constants::PLAYER_Z_POS,
-    movement::{ClampMovementSpeed, MovementPaused, PausedLinearVelocity, Wrapping},
+    movement::{ClampMovementSpeed, PauseMovement, PausedLinearVelocity, Wrapping},
     projectile::SpawnProjectilesEvent,
     tween_events::TweenCompletedEvent,
     CollisionLayer, GameState, PlayState, PlayingField,
@@ -131,7 +131,7 @@ pub fn detect_player_collisions(
 #[instrument(skip_all)]
 pub fn resume_player_movement(mut commands: Commands, query: Query<Entity, With<Player>>) {
     for entity in query.iter() {
-        commands.entity(entity).remove::<MovementPaused>();
+        commands.entity(entity).remove::<PauseMovement>();
     }
 }
 
@@ -206,7 +206,7 @@ pub fn spawn_new_player(
                     position,
                     facing_direction,
                     velocity,
-                    MovementPaused,
+                    PauseMovement,
                 ),
                 (
                     // Movement restrictions...
@@ -401,7 +401,7 @@ pub fn on_player_jumping(
     commands
         .entity(player)
         .insert(Jumping)
-        .insert(MovementPaused)
+        .insert(PauseMovement)
         .insert(AssetAnimator::new(color_tween))
         .insert(Animator::new(pos_tween));
 }
@@ -411,7 +411,7 @@ pub fn on_player_jump_finished(trigger: Trigger<PlayerJumpFinishedEvent>, mut co
     let player = trigger.entity();
     commands
         .entity(player)
-        .remove::<MovementPaused>()
+        .remove::<PauseMovement>()
         .remove::<Jumping>();
     debug!("jump finished");
 }
