@@ -48,7 +48,7 @@ impl Plugin for PlayerPlugin {
         )
         .add_systems(
             OnExit(PlayState::Running),
-            dont_accelerate.in_set(PlayerSet),
+            stop_accelerating.in_set(PlayerSet),
         );
 
         app.add_systems(
@@ -72,7 +72,8 @@ impl Plugin for PlayerPlugin {
         .observe(on_player_death)
         .observe(on_player_firing)
         .observe(on_player_jumping)
-        .observe(on_player_jump_finished);
+        .observe(on_player_jump_finished)
+        .observe(on_new_life);
 
         self::flames::init_rocket_flames(app);
     }

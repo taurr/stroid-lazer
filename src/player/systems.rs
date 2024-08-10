@@ -128,6 +128,12 @@ pub fn detect_player_collisions(
 
 // region: state transitions
 
+pub fn stop_accelerating(players: Query<Entity, With<Player>>, mut commands: Commands) {
+    for player in players.iter() {
+        commands.entity(player).remove::<Accelerating>();
+    }
+}
+
 #[instrument(skip_all)]
 pub fn resume_player_movement(mut commands: Commands, query: Query<Entity, With<Player>>) {
     for entity in query.iter() {
@@ -298,16 +304,30 @@ pub fn clear_safe_radius(
 pub fn update_player_score(
     mut add_score_event: EventReader<AddToScoreEvent>,
     mut score_query: Query<&mut Score>,
+    game_start_settings: Res<GameStartSettings>,
+    mut commands: Commands,
 ) {
     for hit_evt in add_score_event.read() {
-        let mut score = score_query.get_mut(hit_evt.player).unwrap();
-        **score += hit_evt.score;
+        let player = hit_evt.player;
+        let mut score = score_query.get_mut(player).unwrap();
+        let new_score = **score + hit_evt.score;
+        if (**score / game_start_settings.new_life_every)
+            != (new_score / game_start_settings.new_life_every)
+        {
+            commands.trigger_targets(NewLife, player);
+        }
+        **score = new_score;
     }
 }
 
 // endregion
 
 // region: observed events
+
+pub fn on_new_life(trigger: Trigger<NewLife>, mut player_query: Query<&mut Player>) {
+    let mut player = player_query.get_mut(trigger.entity()).unwrap();
+    player.lives += 1;
+}
 
 #[instrument(skip_all)]
 pub fn on_player_death(
@@ -323,12 +343,6 @@ pub fn on_player_death(
     } else {
         warn!("Player dead - Restart");
         next.set(PlayState::StartAfterDeath);
-    }
-}
-
-pub fn dont_accelerate(players: Query<Entity, With<Player>>, mut commands: Commands) {
-    for player in players.iter() {
-        commands.entity(player).remove::<Accelerating>();
     }
 }
 
