@@ -1,9 +1,10 @@
 use bevy::prelude::*;
+use bevy_persistent::Persistent;
 use strum::IntoEnumIterator;
 use tracing::instrument;
 
 use crate::{
-    assets::HighScoreKey,
+    assets::{HighScoreBoard, HighScoreKey},
     player::{Player, Score},
     states::GameOverReason,
     ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
@@ -114,13 +115,20 @@ fn handle_game_over_menu(
     mut event: EventReader<PressedEvent<GameOverButton>>,
     mut play_state: ResMut<NextState<PlayState>>,
     mut game_state: ResMut<NextState<GameState>>,
+    highscore_board: Res<Persistent<HighScoreBoard>>,
 ) {
     for PressedEvent { id, entity: _ } in event.read() {
         match id {
             GameOverButton::PlayAgain => {
+                highscore_board
+                    .persist()
+                    .expect("failed to persist high-scores");
                 play_state.set(PlayState::StartNewGame);
             }
             GameOverButton::MainMenu => {
+                highscore_board
+                    .persist()
+                    .expect("failed to persist high-scores");
                 game_state.set(GameState::MainMenu);
             }
         }
