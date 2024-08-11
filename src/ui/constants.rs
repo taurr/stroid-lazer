@@ -13,6 +13,10 @@ pub const BORDER_RADIUS: BorderRadius = BorderRadius::MAX;
 
 pub const BUTTON_WIDTH: Val = Val::Px(300.0);
 pub const BUTTON_HEIGHT: Val = Val::Px(50.0);
-pub const FONT_SIZE: f32 = 20.0;
 
 pub const BUTTON_GAP_HEIGHT: Val = Val::Px(10.0);
+
+pub const TITLE_FONT_SIZE: f32 = 96.0;
+pub const H1_FONT_SIZE: f32 = 72.0;
+pub const H2_FONT_SIZE: f32 = 32.0;
+pub const BUTTON_FONT_SIZE: f32 = 24.0;

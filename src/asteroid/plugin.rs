@@ -42,7 +42,7 @@ impl Plugin for AsteroidPlugin {
             resume_asteroid_movement.in_set(AsteroidSet),
         )
         .add_systems(
-            PreUpdate,
+            PostUpdate,
             on_remove_asteroid
                 .run_if(in_state(PlayState::Running))
                 .in_set(AsteroidSet),

@@ -27,6 +27,8 @@ impl Plugin for GameAssetsPlugin {
                     .format(StorageFormat::Ron)
                     .path("highscores.ron")
                     .default(HighScoreBoard::default())
+                    .revertible(true)
+                    .revert_to_default_on_deserialization_errors(true)
                     .build()
                     .expect("failed to initialize high-scores"),
             );

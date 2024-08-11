@@ -1,0 +1,25 @@
+stateDiagram-v2
+direction LR
+state " StartNewGame" as NewGame
+state "StartAfterDeath" as Death
+state "StartNextLevel" as LevelClear
+[*] --> NewGame
+NewGame --> CountDown
+CountDown --> Playing
+Playing --> Paused
+Playing --> LevelClear
+Playing --> Death
+Paused --> CountDown
+Death --> CountDown
+Death --> GameOver: No more lives
+LevelClear --> CountDown
+LevelClear --> GameOver: No more levels
+GameOver --> [*]
+classDef play fill:#a0e7db;
+classDef start fill:#e0ffe3;
+classDef count fill:#9ecaa3;
+classDef other fill:#fcf7c1;
+class Playing play
+class NewGame,Death,LevelClear start
+class CountDown count
+class Paused,GameOver,HighScore other

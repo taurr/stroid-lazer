@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_persistent::Persistent;
 use smart_default::SmartDefault;
 #[allow(unused)]
 use tracing::*;
@@ -7,7 +6,6 @@ use tracing::*;
 use crate::{
     assets::{
         DefaultLevelSettings, GameLevelSettings, GameLevelSettingsCollection, GameStartSettings,
-        HighScoreBoard,
     },
     asteroid::AsteroidCount,
     projectile::Projectile,
@@ -62,14 +60,11 @@ impl Plugin for GameLevelsPlugin {
 /// time we need them during the gameplay.
 #[instrument(skip_all)]
 pub fn init_level_settings(
-    highscores: Res<Persistent<HighScoreBoard>>,
     current_level: Res<GameLevel>,
     level_settings_collection: Res<GameLevelSettingsCollection>,
     default_level_settings: Res<DefaultLevelSettings>,
     mut commands: Commands,
 ) {
-    warn!(highscores=?highscores.iter().collect::<Vec<_>>(), "Highscores loaded");
-
     let Some(level_settings) = level_settings_collection.get(&**current_level) else {
         error!(
             level = &**current_level,
@@ -138,9 +133,6 @@ fn detect_level_cleared(
     mut next: ResMut<NextState<PlayState>>,
 ) {
     if **asteroid_counter == 0 {
-        //if let Ok(player) = player.get_single() {
-        //    commands.entity(player).insert(MovementPaused);
-        //}
         let Some(next_level) = &level_settings.next_level else {
             warn!("won the game!");
             next.set(PlayState::GameOver(GameOverReason::GameWon));

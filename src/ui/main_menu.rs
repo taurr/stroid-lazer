@@ -2,12 +2,11 @@ use bevy::prelude::*;
 use tracing::instrument;
 
 use crate::{
-    ui::{
-        common::highlight_interaction,
-        interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
-    },
+    ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
     GameState,
 };
+
+use super::{constants::H1_FONT_SIZE, UiSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MainMenuButton {
@@ -20,11 +19,11 @@ impl InteractionId for MainMenuButton {}
 pub fn build_ui(app: &mut App) {
     let state = GameState::MainMenu;
 
-    app.add_systems(OnEnter(state), spawn_ui)
+    app.add_systems(OnEnter(state), spawn_ui.in_set(UiSet))
         .add_interaction_handler_in_state::<MainMenuButton>(state)
         .add_systems(
             Update,
-            (highlight_interaction::<MainMenuButton>, handle_main_menu).run_if(in_state(state)),
+            handle_main_menu.run_if(in_state(state)).in_set(UiSet),
         );
 }
 
@@ -33,7 +32,6 @@ fn spawn_ui(mut commands: Commands) {
     let menu = spawn_menu!(
         commands,
         GameState::MainMenu,
-        "Game Menu",
         [
             ("Play", MainMenuButton::Play),
             ("Highscores", MainMenuButton::HighScore),
@@ -53,7 +51,7 @@ fn spawn_ui(mut commands: Commands) {
             cmd.spawn(TextBundle::from_section(
                 env!("CARGO_PKG_NAME"),
                 TextStyle {
-                    font_size: 80.0,
+                    font_size: H1_FONT_SIZE,
                     color: Color::WHITE,
                     ..Default::default()
                 },

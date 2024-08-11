@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 itertools = "0.13.0"
 derive_more = { version = "1.0.0", features = ["full"] }
+strum = "0.26.3"
+strum_macros = "0.26.4"
 smart-default = "0.7.1"
 enum-ordinalize = "4.3.0"
 serde = { version = "1.0.205" }
@@ -13,6 +15,7 @@ ron = "0.8.1"
 tracing = "0.1.40"
 anyhow = "1.0.86"
 uuid = { version = "1.10.0", features = ["v7"] }
+aquamarine = "0.5.0"
 
 bevy = { version = "0.14.1", features = ["bevy_dev_tools", "jpeg"] }
 bevy_asset_loader = { version = "0.21.0", features = [
@@ -40,7 +43,6 @@ type_complexity = "allow"
 # Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1
-incremental = false
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]

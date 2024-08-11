@@ -21,8 +21,40 @@ pub struct HighScore {
     pub name: String,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
-pub struct HighScoreKey(Uuid);
+#[derive(Component, Debug, Eq, Clone, Copy)]
+pub struct HighScoreKey {
+    place: usize,
+    key: Uuid,
+}
+
+impl HighScoreKey {
+    pub fn new() -> Self {
+        Self {
+            key: Uuid::now_v7(),
+            place: usize::MAX,
+        }
+    }
+
+    pub fn with_place(self, place: usize) -> Self {
+        Self { place, ..self }
+    }
+
+    pub fn place(&self) -> usize {
+        self.place
+    }
+}
+
+impl std::hash::Hash for HighScoreKey {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.key.hash(state);
+    }
+}
+
+impl PartialEq for HighScoreKey {
+    fn eq(&self, other: &Self) -> bool {
+        self.key == other.key
+    }
+}
 
 const DEFAULT_USER: &str = "New Player";
 const NUM_HIGH_SCORES: usize = 10;
@@ -35,8 +67,17 @@ impl HighScoreBoard {
         self.scores.iter()
     }
 
-    pub fn add_score(&mut self, score: Score) -> Option<HighScoreKey> {
-        let key = HighScoreKey(Uuid::now_v7());
+    pub fn add_score(
+        &mut self,
+        score: Score,
+        old_key: Option<&HighScoreKey>,
+    ) -> Option<HighScoreKey> {
+        let key = old_key
+            .cloned()
+            .inspect(|k| {
+                SCORE_INDEX_KEYS.lock().unwrap().remove(k);
+            })
+            .unwrap_or_else(HighScoreKey::new);
 
         if let Some((index, _)) = self
             .scores
@@ -56,7 +97,7 @@ impl HighScoreBoard {
             while self.scores.len() > NUM_HIGH_SCORES {
                 self.scores.remove(NUM_HIGH_SCORES);
             }
-            return Some(key);
+            return Some(key.with_place(index));
         };
 
         if self.scores.len() < NUM_HIGH_SCORES {
@@ -67,7 +108,7 @@ impl HighScoreBoard {
                 name: DEFAULT_USER.to_string(),
                 score,
             });
-            return Some(key);
+            return Some(key.with_place(index));
         }
 
         None

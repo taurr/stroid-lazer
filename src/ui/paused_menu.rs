@@ -3,14 +3,11 @@ use tracing::instrument;
 
 use crate::{
     assets::{GameStartSettings, InputKeySettings},
-    ui::{
-        common::highlight_interaction,
-        interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
-    },
+    ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
     PlayState,
 };
 
-use super::countdown_ui::CountdownTimer;
+use super::{constants::H1_FONT_SIZE, countdown_ui::CountdownTimer, UiSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PausedButton {
@@ -25,24 +22,29 @@ struct ResumeEvent;
 struct PauseEvent;
 
 pub fn build_ui(app: &mut App) {
-    app.add_systems(OnEnter(PlayState::Paused), spawn_ui)
+    app.add_systems(OnEnter(PlayState::Paused), spawn_ui.in_set(UiSet))
         .add_interaction_handler_in_state::<PausedButton>(PlayState::Paused)
         .add_systems(
             Update,
-            (|mut commands: Commands| commands.trigger(PauseEvent)).run_if(
-                (in_state(PlayState::CountdownBeforeRunning).or_else(in_state(PlayState::Running)))
+            (|mut commands: Commands| commands.trigger(PauseEvent))
+                .run_if(
+                    (in_state(PlayState::CountdownBeforeRunning)
+                        .or_else(in_state(PlayState::Running)))
                     .and_then(not(window_has_focus).or_else(pause_key_pressed)),
-            ),
+                )
+                .in_set(UiSet),
         )
         .add_systems(
             Update,
             (|mut commands: Commands| commands.trigger(ResumeEvent))
-                .run_if(in_state(PlayState::Paused).and_then(pause_key_pressed)),
+                .run_if(in_state(PlayState::Paused).and_then(pause_key_pressed))
+                .in_set(UiSet),
         )
         .add_systems(
             Update,
-            (highlight_interaction::<PausedButton>, handle_paused_menu)
-                .run_if(in_state(PlayState::Paused)),
+            handle_paused_menu
+                .run_if(in_state(PlayState::Paused))
+                .in_set(UiSet),
         )
         .observe(on_resume_event)
         .observe(on_pause_event);
@@ -53,7 +55,6 @@ fn spawn_ui(mut commands: Commands) {
     let menu = spawn_menu!(
         commands,
         PlayState::Paused,
-        "Paused Menu",
         [("Continue", PausedButton::Continue),]
     );
 
@@ -69,7 +70,7 @@ fn spawn_ui(mut commands: Commands) {
             cmd.spawn(TextBundle::from_section(
                 "Game Paused",
                 TextStyle {
-                    font_size: 80.0,
+                    font_size: H1_FONT_SIZE,
                     color: Color::WHITE,
                     ..Default::default()
                 },

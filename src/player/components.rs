@@ -27,7 +27,11 @@ pub struct PlayerSprite;
     PartialOrd,
     Ord,
 )]
-pub struct Score(usize);
+pub struct Score {
+    #[deref]
+    #[deref_mut]
+    score: usize,
+}
 
 #[derive(Component, Reflect, Debug, Display, Deref, DerefMut, Constructor, Clone)]
 pub struct EquippedWeapon(String);

@@ -6,7 +6,7 @@ use crate::{states::GameState, PlayState};
 use super::*;
 
 #[derive(Debug, Clone, Default, SystemSet, PartialEq, Eq, Hash)]
-struct ProjectileSet;
+pub struct ProjectileSet;
 
 pub struct ProjectilePlugin;
 

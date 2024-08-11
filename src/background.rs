@@ -7,7 +7,6 @@ use tracing::*;
 
 use crate::{
     assets::{GameLevelSettings, StateBackgrounds},
-    levels::GameLevelsSet,
     states::{GameOverReason, GameState, PlayState},
 };
 
@@ -34,61 +33,38 @@ impl Plugin for BackgroundPlugin {
                         .and_then(state_changed::<GameState>.or_else(state_changed::<PlayState>)),
                 )
                 .in_set(BackgroundSet),
-        )
-        .add_systems(
-            OnEnter(PlayState::StartNewGame),
-            set_level_background
-                .after(GameLevelsSet)
-                .in_set(BackgroundSet),
-        )
-        .add_systems(
-            OnExit(PlayState::StartNextLevel),
-            set_level_background
-                .after(GameLevelsSet)
-                .in_set(BackgroundSet),
         );
     }
 }
 
 fn set_state_background(
     game_state: Res<State<GameState>>,
-    play_state: Option<Res<State<PlayState>>>,
     background_query: Query<Entity, With<Background>>,
     backgrounds: Res<StateBackgrounds>,
+    play_state: Option<Res<State<PlayState>>>,
+    level_settings: Option<Res<GameLevelSettings>>,
+    asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
     let background = match **game_state {
         GameState::LoadingAssets => None,
         GameState::MainMenu => Some(backgrounds.main_menu.clone()),
         GameState::Playing => match **play_state.unwrap() {
-            PlayState::StartNewGame => None,
-            PlayState::StartAfterDeath => None,
-            PlayState::StartNextLevel => None,
-            PlayState::CountdownBeforeRunning => None,
-            PlayState::Running => None,
-            PlayState::Paused => None,
+            PlayState::CountdownBeforeRunning => level_settings
+                .map(|s| s.background.clone())
+                .map(|h| asset_server.load(h)),
             PlayState::GameOver(reason) => match reason {
                 GameOverReason::PlayerDead => Some(backgrounds.game_over.clone()),
                 GameOverReason::GameWon => Some(backgrounds.game_won.clone()),
             },
+            _ => {
+                // Do NOT change background for any other state.
+                None
+            }
         },
     };
 
-    if let Some(background) = background {
-        commands
-            .entity(background_query.single())
-            .insert(background);
+    if let (Some(background), Ok(backgound_entity)) = (background, background_query.get_single()) {
+        commands.entity(backgound_entity).insert(background);
     }
-}
-
-fn set_level_background(
-    level_settings: Res<GameLevelSettings>,
-    background_query: Query<Entity, With<Background>>,
-    asset_server: Res<AssetServer>,
-    mut commands: Commands,
-) {
-    let background: Handle<Image> = asset_server.load(&level_settings.background);
-    commands
-        .entity(background_query.single())
-        .insert(background);
 }

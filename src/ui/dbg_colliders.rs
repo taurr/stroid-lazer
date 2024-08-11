@@ -5,6 +5,7 @@ use bevy::{
 };
 use tracing::instrument;
 
+use super::UiSet;
 use crate::states::GameState;
 
 pub fn build_ui(app: &mut App) {
@@ -12,7 +13,9 @@ pub fn build_ui(app: &mut App) {
 
     app.add_systems(OnEnter(state), spawn_ui).add_systems(
         Update,
-        wait_for_esc.run_if(in_state(GameState::DebugColliders)),
+        wait_for_esc
+            .run_if(in_state(GameState::DebugColliders))
+            .in_set(UiSet),
     );
 }
 
@@ -39,8 +42,7 @@ fn spawn_ui(mut commands: Commands) {
             commands.spawn(TextBundle::from_section(
                 "Press ESC to continue",
                 TextStyle {
-                    //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 20.0,
+                    font_size: BUTTON_FONT_SIZE,
                     color: css::WHITE.into(),
                     ..Default::default()
                 },
