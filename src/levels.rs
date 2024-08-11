@@ -133,9 +133,6 @@ fn detect_level_cleared(
     mut next: ResMut<NextState<PlayState>>,
 ) {
     if **asteroid_counter == 0 {
-        //if let Ok(player) = player.get_single() {
-        //    commands.entity(player).insert(MovementPaused);
-        //}
         let Some(next_level) = &level_settings.next_level else {
             warn!("won the game!");
             next.set(PlayState::GameOver(GameOverReason::GameWon));

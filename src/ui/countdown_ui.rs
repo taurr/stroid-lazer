@@ -4,9 +4,13 @@ use bevy::{color::palettes::css, prelude::*};
 use tracing::instrument;
 
 use crate::{
-    assets::GameStartSettings, levels::GameLevelsSet, ui::constants::BACKDROP_COLOR, GameLevel,
-    PlayState,
+    assets::GameStartSettings,
+    levels::GameLevelsSet,
+    ui::constants::{BACKDROP_COLOR, H1_FONT_SIZE, TITLE_FONT_SIZE},
+    GameLevel, PlayState,
 };
+
+use super::UiSet;
 
 #[derive(Component, Debug, Clone)]
 struct CountdownText;
@@ -47,11 +51,16 @@ pub fn build_ui(app: &mut App) {
     app.init_resource::<CountdownTimer>()
         .add_systems(
             OnEnter(state),
-            setup_coundown_time.pipe(spawn_ui).after(GameLevelsSet),
+            (setup_coundown_time, spawn_ui)
+                .chain()
+                .after(GameLevelsSet)
+                .in_set(UiSet),
         )
         .add_systems(
             Update,
-            update_countdown_text.run_if(in_state(PlayState::CountdownBeforeRunning)),
+            update_countdown_text
+                .run_if(in_state(PlayState::CountdownBeforeRunning))
+                .in_set(UiSet),
         );
 }
 
@@ -113,7 +122,7 @@ fn spawn_ui(
                             "",
                             TextStyle {
                                 //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                font_size: 144.0,
+                                font_size: TITLE_FONT_SIZE,
                                 color: css::WHITE.into(),
                                 ..Default::default()
                             },
@@ -135,7 +144,7 @@ fn spawn_ui(
             cmd.spawn(TextBundle::from_section(
                 (**current_level).clone(),
                 TextStyle {
-                    font_size: 80.0,
+                    font_size: H1_FONT_SIZE,
                     color: Color::WHITE,
                     ..Default::default()
                 },

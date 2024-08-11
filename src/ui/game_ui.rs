@@ -8,6 +8,8 @@ use crate::{
     GameLevel, GameState,
 };
 
+use super::UiSet;
+
 pub fn build_ui(app: &mut App) {
     let state = GameState::Playing;
 
@@ -15,7 +17,8 @@ pub fn build_ui(app: &mut App) {
         .add_systems(
             Update,
             (update_level_text, update_lives_text, update_asteroid_count)
-                .run_if(in_state(PlayState::CountdownBeforeRunning)),
+                .run_if(in_state(PlayState::CountdownBeforeRunning))
+                .in_set(UiSet),
         )
         .add_systems(
             Update,
@@ -25,7 +28,8 @@ pub fn build_ui(app: &mut App) {
                 update_lives_text,
                 update_asteroid_count,
             )
-                .run_if(in_state(PlayState::Running)),
+                .run_if(in_state(PlayState::Running))
+                .in_set(UiSet),
         );
 }
 

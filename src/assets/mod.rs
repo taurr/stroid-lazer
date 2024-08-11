@@ -8,6 +8,7 @@ mod game_area_settings;
 mod game_level_settings;
 mod game_settings;
 mod game_start_settings;
+mod highscores;
 mod input_key_settings;
 mod level_startup_settings;
 mod optional; // for deserialization and serialization of Option<T>
@@ -31,6 +32,7 @@ pub use game_area_settings::*;
 pub use game_level_settings::*;
 pub use game_settings::*;
 pub use game_start_settings::*;
+pub use highscores::*;
 pub use input_key_settings::*;
 pub use level_startup_settings::*;
 pub use player_settings::*;

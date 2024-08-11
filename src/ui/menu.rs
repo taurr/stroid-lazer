@@ -1,10 +1,8 @@
 macro_rules! spawn_menu {
-    ($cmd:ident, $state:expr, $menu_name:literal, [$(($button_name:literal, $button_event:expr)),*$(,)?]) => {
-        //debug!("spawning {}", $menu_name);
+    ($cmd:ident, $state:expr, [$(($button_name:literal, $button_event:expr)),*$(,)?]) => {
         {
             let id = $cmd.spawn((
                 StateScoped($state),
-                Name::new($menu_name),
                 NodeBundle {
                     style: Style {
                         width: Val::Percent(100.0),
@@ -55,7 +53,7 @@ macro_rules! spawn_menu {
                             cmd.spawn(TextBundle::from_section(
                                 button_text,
                                 TextStyle {
-                                    font_size: crate::ui::constants::FONT_SIZE,
+                                    font_size: crate::ui::constants::BUTTON_FONT_SIZE,
                                     color: crate::ui::constants::TEXT_COLOR,
                                     ..Default::default()
                                 },

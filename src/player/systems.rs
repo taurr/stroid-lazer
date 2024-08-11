@@ -2,6 +2,7 @@ use core::f32::consts::TAU;
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_persistent::Persistent;
 use bevy_turborand::{DelegatedRng, RngComponent};
 use bevy_tweening::{
     lens::{ColorMaterialColorLens, TransformPositionLens},
@@ -15,7 +16,7 @@ use super::{input::PlayerAction, *};
 use crate::{
     assets::{
         game_assets::PlayerSpriteSheet, EntityCommandsExt, GameAreaSettings, GameStartSettings,
-        InputKeySettings, PlayerSettings,
+        HighScoreBoard, HighScoreKey, InputKeySettings, PlayerSettings,
     },
     asteroid::AsteroidSprite,
     constants::PLAYER_Z_POS,
@@ -303,20 +304,32 @@ pub fn clear_safe_radius(
 #[instrument(skip_all)]
 pub fn update_player_score(
     mut add_score_event: EventReader<AddToScoreEvent>,
-    mut score_query: Query<&mut Score>,
+    mut highscores: ResMut<Persistent<HighScoreBoard>>,
+    mut score_query: Query<(&mut Score, Option<&HighScoreKey>)>,
     game_start_settings: Res<GameStartSettings>,
     mut commands: Commands,
 ) {
     for hit_evt in add_score_event.read() {
         let player = hit_evt.player;
-        let mut score = score_query.get_mut(player).unwrap();
+        let (mut score, highscore_key) = score_query.get_mut(player).unwrap();
+
         let new_score = **score + hit_evt.score;
+
+        // add new life
         if (**score / game_start_settings.new_life_every)
             != (new_score / game_start_settings.new_life_every)
         {
             commands.trigger_targets(NewLife, player);
         }
+
+        // update highscore
         **score = new_score;
+
+        // maybe update highscore key
+        if let Some(new_highscore_key) = highscores.add_score(*score, highscore_key) {
+            debug!(?score, "Highscore reached");
+            commands.entity(player).insert(new_highscore_key);
+        }
     }
 }
 

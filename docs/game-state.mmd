@@ -1,0 +1,8 @@
+stateDiagram-v2
+Direction LR
+[*] --> LoadingAssets
+LoadingAssets --> DebugColliders: [dbg_colliders]
+LoadingAssets --> MainMenu
+DebugColliders --> MainMenu
+MainMenu --> Playing
+Playing --> MainMenu
