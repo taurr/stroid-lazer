@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
@@ -20,19 +22,22 @@ pub struct GameAssetsPlugin;
 
 impl Plugin for GameAssetsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, |mut commands: Commands| {
-            commands.insert_resource(
-                Persistent::<HighScoreBoard>::builder()
-                    .name("high-scores")
-                    .format(StorageFormat::Ron)
-                    .path("highscores.ron")
-                    .default(HighScoreBoard::default())
-                    .revertible(true)
-                    .revert_to_default_on_deserialization_errors(true)
-                    .build()
-                    .expect("failed to initialize high-scores"),
-            );
-        });
+        let state_dir = dirs::state_dir()
+            .map(|native_state_dir| native_state_dir.join(env!("CARGO_PKG_NAME")))
+            .unwrap_or(Path::new("local").join("state"));
+        info!(?state_dir, "State directory");
+
+        app.insert_resource(
+            Persistent::<HighScoreBoard>::builder()
+                .name("highscore board")
+                .format(StorageFormat::Ron)
+                .path(state_dir.join("highscores.ron"))
+                .default(HighScoreBoard::default())
+                .revertible(true)
+                .revert_to_default_on_deserialization_errors(true)
+                .build()
+                .expect("failed to initialize high-scores"),
+        );
 
         // register assets for debug
         app.register_type::<AsteroidPoolCollection>()
