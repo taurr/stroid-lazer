@@ -374,9 +374,9 @@ checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
 
 [[package]]
 name = "avian2d"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "757274b827f77c3853fd36c4229ebeda55746fc297244bcd1104e561dab34326"
+checksum = "63b586289578913c009ad13cf138e5b676b23df78894c299a9db14fdecee92e3"
 dependencies = [
  "avian_derive",
  "bevy",

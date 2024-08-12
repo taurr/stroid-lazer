@@ -24,7 +24,7 @@ bevy_asset_loader = { version = "0.21.0", features = [
     "standard_dynamic_assets",
 ] }
 bevy_common_assets = { version = "0.11.0", features = ["ron"] }
-avian2d = { version = "0.1.1", features = ["serialize"] }
+avian2d = { version = "0.1.2", features = ["serialize"] }
 bevy_turborand = "0.9.0"
 leafwing-input-manager = "0.15.0"
 bevy_tweening = "0.11.0"
@@ -43,11 +43,19 @@ type_complexity = "allow"
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]
-opt-level = 1
+opt-level = 0
+lto = "off"
 
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
+
+[profile.release]
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
 
 [features]
 default = [ "cmd_line" ]
