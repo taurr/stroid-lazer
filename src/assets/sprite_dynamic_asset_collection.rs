@@ -12,7 +12,9 @@ use bevy::{
 use bevy_asset_loader::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::{optional, AmmonitionTextureCollection, AsteroidTextureCollection, SpriteSheetAsset};
+use crate::assets::{
+    optional, AmmonitionTextureCollection, AsteroidTextureCollection, SpriteSheetAsset,
+};
 
 #[derive(Asset, TypePath, Deserialize, Debug, Default, Clone)]
 pub struct SpriteDynamicAssetCollection(HashMap<String, SpriteDynamicAsset>);

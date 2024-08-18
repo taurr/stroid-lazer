@@ -1,9 +1,14 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
 
-use crate::{states::GameState, PlayState};
-
-use super::*;
+use crate::{
+    projectile::{
+        despawn_all_projectiles, detect_projetile_collision, on_projectile_spawn,
+        spawn_projectiles, timeout_projectiles, ProjectileCollisionEvent, SpawnProjectilesEvent,
+    },
+    states::GameState,
+    PlayState,
+};
 
 #[derive(Debug, Clone, Default, SystemSet, PartialEq, Eq, Hash)]
 pub struct ProjectileSet;

@@ -1,8 +1,9 @@
 use bevy::{audio::Volume, prelude::*};
-use tracing::instrument;
 
-use super::Accelerating;
-use crate::assets::{game_assets::FlameSpriteSheet, EntityCommandsExt, PlayerSettings};
+use crate::{
+    assets::{game_assets::FlameSpriteSheet, EntitySpriteSheetCommands, PlayerSettings},
+    player::Accelerating,
+};
 
 pub fn init_rocket_flames(app: &mut App) {
     app.observe(on_add_accelerating)
@@ -12,7 +13,6 @@ pub fn init_rocket_flames(app: &mut App) {
 #[derive(Component, Debug)]
 struct RocketFlames;
 
-#[instrument(skip_all)]
 fn on_add_accelerating(
     trigger: Trigger<OnAdd, Accelerating>,
     mut commands: Commands,
@@ -29,7 +29,7 @@ fn on_add_accelerating(
                     volume: Volume::new(1.0),
                     spatial: true,
                     ..PlaybackSettings::LOOP
-                }
+                },
             });
         }
         flame.insert_spritesheet(spritesheet_asset.spritesheet(), None, || ());
@@ -37,7 +37,6 @@ fn on_add_accelerating(
     trace!("Added rocket flame");
 }
 
-#[instrument(skip_all)]
 fn on_remove_accelerating(
     trigger: Trigger<OnRemove, Accelerating>,
     mut commands: Commands,

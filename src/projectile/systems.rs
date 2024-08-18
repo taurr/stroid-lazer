@@ -1,22 +1,22 @@
 use avian2d::prelude::*;
 use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
-use tracing::instrument;
 
 use crate::{
     assets::{
-        AmmonitionDepot, AmmonitionSelection, AmmonitionTextureCollection, EntityCommandsExt,
-        WeaponCollection,
+        AmmonitionDepot, AmmonitionSelection, AmmonitionTextureCollection,
+        EntitySpriteSheetCommands, WeaponCollection,
     },
     movement::Wrapping,
     player::Player,
+    projectile::{
+        Projectile, ProjectileCollisionEvent, ProjectileSprite, SpawnProjectilesEvent,
+        SpawnSingleProjectileEvent,
+    },
     utils::RngComponentExt,
     CollisionLayer, GameState, PlayingField,
 };
 
-use super::*;
-
-#[instrument(skip_all)]
 pub fn despawn_all_projectiles(
     projectile_query: Query<Entity, With<Projectile>>,
     mut commands: Commands,
@@ -27,7 +27,6 @@ pub fn despawn_all_projectiles(
     }
 }
 
-#[instrument(skip_all)]
 pub fn spawn_projectiles(
     mut ev_spawn: EventReader<SpawnProjectilesEvent>,
     mut commands: Commands,
@@ -114,7 +113,6 @@ fn pick_random_ammonition_index(
     }
 }
 
-#[instrument(skip_all)]
 pub fn on_projectile_spawn(
     trigger: Trigger<SpawnSingleProjectileEvent>,
     playing_field: Query<Entity, With<PlayingField>>,
@@ -195,7 +193,6 @@ pub fn on_projectile_spawn(
 }
 
 /// System for detecting player collision with any collider as setup when the player is spawned.
-#[instrument(skip_all)]
 pub fn detect_projetile_collision(
     mut commands: Commands,
     collision_query: Query<
@@ -229,7 +226,6 @@ pub fn detect_projetile_collision(
     }
 }
 
-#[instrument(skip_all)]
 pub fn timeout_projectiles(
     mut commands: Commands,
     time: Res<Time>,

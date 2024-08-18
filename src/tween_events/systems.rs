@@ -2,9 +2,7 @@ use bevy::prelude::*;
 use bevy_tweening::TweenCompleted;
 use enum_ordinalize::Ordinalize;
 
-use crate::player::PlayerJumpFinishedEvent;
-
-use super::TweenCompletedEvent;
+use crate::{player::PlayerJumpFinishedEvent, tween_events::TweenCompletedEvent};
 
 pub fn handle_tween_completed(
     mut tween_events: EventReader<TweenCompleted>,

@@ -4,8 +4,7 @@ use bevy::prelude::*;
 use derive_more::{Deref, DerefMut};
 use serde::Deserialize;
 
-use super::optional;
-use super::{game_assets::GameAssets, AsteroidSelection};
+use crate::assets::{asteroid_selection::AsteroidSelection, game_assets::GameAssets, optional};
 
 /// Loaded as part of the [crate::assets::AsteroidAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]

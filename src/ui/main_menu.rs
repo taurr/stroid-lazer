@@ -1,12 +1,13 @@
 use bevy::prelude::*;
-use tracing::instrument;
 
 use crate::{
-    ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+    ui::{
+        constants::H1_FONT_SIZE,
+        interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+        UiSet,
+    },
     GameState,
 };
-
-use super::{constants::H1_FONT_SIZE, UiSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MainMenuButton {
@@ -27,7 +28,6 @@ pub fn build_ui(app: &mut App) {
         );
 }
 
-#[instrument(skip_all)]
 fn spawn_ui(mut commands: Commands) {
     let menu = spawn_menu!(
         commands,

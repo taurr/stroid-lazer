@@ -1,13 +1,15 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-use tracing::instrument;
 
 use crate::{
     assets::{GameStartSettings, InputKeySettings},
-    ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+    ui::{
+        constants::H1_FONT_SIZE,
+        countdown_ui::CountdownTimer,
+        interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+        UiSet,
+    },
     PlayState,
 };
-
-use super::{constants::H1_FONT_SIZE, countdown_ui::CountdownTimer, UiSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PausedButton {
@@ -50,7 +52,6 @@ pub fn build_ui(app: &mut App) {
         .observe(on_pause_event);
 }
 
-#[instrument(skip_all)]
 fn spawn_ui(mut commands: Commands) {
     let menu = spawn_menu!(
         commands,

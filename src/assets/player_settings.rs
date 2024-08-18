@@ -1,10 +1,9 @@
-use core::time::Duration;
-use std::ops::Range;
+use core::{ops::Range, time::Duration};
 
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use super::optional;
+use crate::assets::optional;
 
 #[derive(Reflect, Deserialize, Debug, Clone)]
 pub struct PlayerSettingOptions {

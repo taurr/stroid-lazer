@@ -58,7 +58,6 @@ impl Plugin for GameLevelsPlugin {
 ///
 /// This wastes a little bit of memory, but saves us from looking up and merging settings every
 /// time we need them during the gameplay.
-#[instrument(skip_all)]
 pub fn init_level_settings(
     current_level: Res<GameLevel>,
     level_settings_collection: Res<GameLevelSettingsCollection>,
@@ -88,7 +87,6 @@ pub fn init_level_settings(
 }
 
 /// Initialize [GameLevel] to the correct starting level.
-#[instrument(skip_all)]
 fn start_new_game(
     mut next: ResMut<NextState<PlayState>>,
     mut level: ResMut<GameLevel>,
@@ -100,7 +98,6 @@ fn start_new_game(
 }
 
 /// Currently, just go directly to the countdown state.
-#[instrument(skip_all)]
 fn start_after_death(
     projectiles: Query<Entity, With<Projectile>>,
     mut next: ResMut<NextState<PlayState>>,
@@ -112,7 +109,6 @@ fn start_after_death(
 }
 
 /// Currently, just go directly to the countdown state.
-#[instrument(skip_all)]
 fn start_next_level(
     projectiles: Query<Entity, With<Projectile>>,
     mut next: ResMut<NextState<PlayState>>,
@@ -125,7 +121,6 @@ fn start_next_level(
 
 /// Detects when all asteroids have been destroyed, and all projectiles are gone, then transitions
 /// to either [PlayState::GameOver] or [PlayState::StartNextLevel] depending on the current level.
-#[instrument(skip_all)]
 fn detect_level_cleared(
     asteroid_counter: Res<AsteroidCount>,
     level_settings: Res<GameLevelSettings>,

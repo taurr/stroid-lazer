@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use crate::movement::GameArea;
-
-use super::{game_assets::GameAssets, GameSettings};
+use crate::{
+    assets::{game_assets::GameAssets, GameSettings},
+    movement::GameArea,
+};
 
 /// Resource is initialized after loading assets, through its [FromWorld] implementation.
 #[derive(Resource, Deserialize, Reflect, Debug, Clone)]

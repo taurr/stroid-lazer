@@ -3,9 +3,7 @@ use std::collections::BTreeMap;
 use bevy::prelude::*;
 use derive_more::{Constructor, Deref, DerefMut};
 
-use crate::assets::SpriteSheetAsset;
-
-use super::game_assets::GameAssets;
+use crate::assets::{game_assets::GameAssets, SpriteSheetAsset};
 
 /// Loaded as part of the [crate::assets::AsteroidAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Reflect, Debug, Clone, Deref, DerefMut, Constructor)]

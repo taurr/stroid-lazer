@@ -5,8 +5,7 @@ use bevy::prelude::*;
 use derive_more::{Deref, DerefMut};
 use serde::Deserialize;
 
-use super::game_assets::GameAssets;
-//use super::optional;
+use crate::assets::game_assets::GameAssets;
 
 /// Loaded as part of the [GameAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Reflect, Deserialize, Debug, Clone, Deref, DerefMut)]

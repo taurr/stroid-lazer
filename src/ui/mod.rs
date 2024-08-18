@@ -1,5 +1,6 @@
 #[macro_use]
 mod menu;
+
 mod constants;
 mod countdown_ui;
 mod game_over_menu;

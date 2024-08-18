@@ -1,16 +1,16 @@
 use core::time::Duration;
 
 use bevy::{color::palettes::css, prelude::*};
-use tracing::instrument;
 
 use crate::{
     assets::GameStartSettings,
     levels::GameLevelsSet,
-    ui::constants::{BACKDROP_COLOR, H1_FONT_SIZE, TITLE_FONT_SIZE},
+    ui::{
+        constants::{BACKDROP_COLOR, H1_FONT_SIZE, TITLE_FONT_SIZE},
+        UiSet,
+    },
     GameLevel, PlayState,
 };
-
-use super::UiSet;
 
 #[derive(Component, Debug, Clone)]
 struct CountdownText;
@@ -64,7 +64,6 @@ pub fn build_ui(app: &mut App) {
         );
 }
 
-#[instrument(skip_all)]
 fn setup_coundown_time(
     timer_res: Res<CountdownTimer>,
     game_start: Res<GameStartSettings>,
@@ -83,7 +82,6 @@ fn setup_coundown_time(
     }
 }
 
-#[instrument(skip_all)]
 fn spawn_ui(
     mut commands: Commands,
     current_level: Res<GameLevel>,

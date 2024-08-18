@@ -3,7 +3,6 @@ use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
 };
-use tracing::instrument;
 
 use super::UiSet;
 use crate::states::GameState;
@@ -19,7 +18,6 @@ pub fn build_ui(app: &mut App) {
     );
 }
 
-#[instrument(skip_all)]
 fn spawn_ui(mut commands: Commands) {
     debug!("spawning collider debug ui");
     commands

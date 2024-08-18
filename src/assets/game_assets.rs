@@ -3,10 +3,9 @@ use bevy_asset_loader::prelude::*;
 
 use crate::assets::{GameSettings, SpriteSheetAsset};
 
-use super::{
-    ammonition_depot::AmmonitionDepot, asteroid_pool_collection::AsteroidPoolCollection,
-    asteroid_texture_collection::AsteroidTextureCollection, input_key_settings::InputKeySettings,
-    weapon_collection::WeaponCollection, AmmonitionTextureCollection, GameLevelSettingsCollection,
+use crate::assets::{
+    AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
+    AsteroidTextureCollection, GameLevelSettingsCollection, InputKeySettings, WeaponCollection,
 };
 
 /// Loaded directly as a [Resource] by [bevy_asset_loader].

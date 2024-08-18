@@ -1,7 +1,6 @@
 use bevy::prelude::*;
-use tracing::instrument;
 
-use super::constants::{HOVERED_BUTTON, NORMAL_BUTTON, PRESSED_BUTTON};
+use crate::ui::constants::{HOVERED_BUTTON, NORMAL_BUTTON, PRESSED_BUTTON};
 
 #[derive(Debug, SystemSet, PartialEq, Eq, Hash, Clone)]
 pub struct InteractionSet;
@@ -58,7 +57,6 @@ pub struct PressedEvent<T> {
     pub entity: Entity,
 }
 
-#[instrument(skip_all)]
 fn interaction_handler<T: InteractionId + 'static>(
     query: Query<(Entity, &Interaction, &InteractionIdComponent<T>), Changed<Interaction>>,
     mut interaction_event: EventWriter<InteractionEvent<T>>,

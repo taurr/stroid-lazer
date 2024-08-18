@@ -10,17 +10,20 @@ use bevy_tweening::{
 };
 use itertools::Itertools;
 use leafwing_input_manager::prelude::*;
-use tracing::instrument;
 
-use super::{input::PlayerAction, *};
 use crate::{
     assets::{
-        game_assets::PlayerSpriteSheet, EntityCommandsExt, GameAreaSettings, GameStartSettings,
-        HighScoreBoard, HighScoreKey, InputKeySettings, PlayerSettings,
+        game_assets::PlayerSpriteSheet, EntitySpriteSheetCommands, GameAreaSettings,
+        GameStartSettings, HighScoreBoard, HighScoreKey, InputKeySettings, PlayerSettings,
     },
     asteroid::AsteroidSprite,
     constants::PLAYER_Z_POS,
     movement::{ClampMovementSpeed, PauseMovement, PausedLinearVelocity, Wrapping},
+    player::{
+        input::PlayerAction, Accelerating, AddToScoreEvent, Dead, EquippedWeapon, Jumping, NewLife,
+        Player, PlayerDeadEvent, PlayerFireEvent, PlayerJumpFinishedEvent, PlayerJumpingEvent,
+        PlayerSprite, Score, Turning,
+    },
     projectile::SpawnProjectilesEvent,
     tween_events::TweenCompletedEvent,
     CollisionLayer, GameState, PlayState, PlayingField,
@@ -28,7 +31,6 @@ use crate::{
 
 // region: general systems
 
-#[instrument(skip_all)]
 pub fn player_acceleration_and_turning(
     player_settings: Res<PlayerSettings>,
     mut q: ParamSet<(
@@ -71,7 +73,6 @@ pub fn player_acceleration_and_turning(
     }
 }
 
-#[instrument(skip_all)]
 pub fn detect_player_collisions(
     player_collision_query: Query<(&ColliderParent, &CollidingEntities), With<PlayerSprite>>,
     player_query: Query<&Transform, (With<Player>, Without<Jumping>, Without<Dead>)>,
@@ -135,14 +136,12 @@ pub fn stop_accelerating(players: Query<Entity, With<Player>>, mut commands: Com
     }
 }
 
-#[instrument(skip_all)]
 pub fn resume_player_movement(mut commands: Commands, query: Query<Entity, With<Player>>) {
     for entity in query.iter() {
         commands.entity(entity).remove::<PauseMovement>();
     }
 }
 
-#[instrument(skip_all)]
 pub fn despawn_old_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
     for player in player_query.iter() {
         debug!(?player, "despawning old player");
@@ -150,7 +149,6 @@ pub fn despawn_old_player(mut commands: Commands, player_query: Query<Entity, Wi
     }
 }
 
-#[instrument(skip_all)]
 pub fn spawn_new_player(
     playing_field_query: Query<Entity, With<PlayingField>>,
     mut rand_query: Query<&mut RngComponent, With<PlayingField>>,
@@ -249,7 +247,6 @@ pub fn spawn_new_player(
         });
 }
 
-#[instrument(skip_all)]
 pub fn reset_player_movement_system(
     mut commands: Commands,
     mut player_query: Query<(Entity, &mut RngComponent), With<Player>>,
@@ -270,7 +267,6 @@ pub fn reset_player_movement_system(
         .insert((position, facing_direction, velocity, clamp_movement));
 }
 
-#[instrument(skip_all)]
 pub fn clear_safe_radius(
     mut commands: Commands,
     player_query: Query<(Entity, &Position, &Rotation), With<Player>>,
@@ -301,7 +297,6 @@ pub fn clear_safe_radius(
 
 // region: event handling
 
-#[instrument(skip_all)]
 pub fn update_player_score(
     mut add_score_event: EventReader<AddToScoreEvent>,
     mut highscores: ResMut<Persistent<HighScoreBoard>>,
@@ -342,7 +337,6 @@ pub fn on_new_life(trigger: Trigger<NewLife>, mut player_query: Query<&mut Playe
     player.lives += 1;
 }
 
-#[instrument(skip_all)]
 pub fn on_player_death(
     trigger: Trigger<PlayerDeadEvent>,
     mut player: Query<&mut Player>,
@@ -359,7 +353,6 @@ pub fn on_player_death(
     }
 }
 
-#[instrument(skip_all)]
 pub fn on_player_firing(
     trigger: Trigger<PlayerFireEvent>,
     weapon_query: Query<&EquippedWeapon>,
@@ -371,7 +364,6 @@ pub fn on_player_firing(
     projectile_events.send(SpawnProjectilesEvent { player, weapon });
 }
 
-#[instrument(skip_all)]
 pub fn on_player_jumping(
     trigger: Trigger<PlayerJumpingEvent>,
     mut commands: Commands,
@@ -433,7 +425,6 @@ pub fn on_player_jumping(
         .insert(Animator::new(pos_tween));
 }
 
-#[instrument(skip_all)]
 pub fn on_player_jump_finished(trigger: Trigger<PlayerJumpFinishedEvent>, mut commands: Commands) {
     let player = trigger.entity();
     commands

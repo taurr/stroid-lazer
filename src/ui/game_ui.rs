@@ -1,14 +1,12 @@
 use bevy::{color::palettes::css, prelude::*};
-use tracing::instrument;
 
 use crate::{
     asteroid::AsteroidCount,
     player::{Player, Score},
     states::PlayState,
+    ui::UiSet,
     GameLevel, GameState,
 };
-
-use super::UiSet;
 
 pub fn build_ui(app: &mut App) {
     let state = GameState::Playing;
@@ -45,7 +43,6 @@ struct LivesText;
 #[derive(Component, Debug, Clone)]
 struct AsteroidText;
 
-#[instrument(skip_all)]
 fn spawn_ui(mut commands: Commands) {
     debug!("spawning game ui");
     commands

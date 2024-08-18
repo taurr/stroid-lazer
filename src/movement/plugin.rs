@@ -1,11 +1,12 @@
 use avian2d::PhysicsPlugins;
 use bevy::prelude::*;
 
-use crate::states::PlayState;
-
-use super::{
-    systems::*, ClampMovementSpeed, GameArea, PausedAngularVelocity, PausedLinearVelocity,
-    WrappingGameAreaOn,
+use crate::{
+    movement::{
+        systems::*, ClampMovementSpeed, GameArea, PausedAngularVelocity, PausedLinearVelocity,
+        WrappingGameAreaOn,
+    },
+    states::PlayState,
 };
 
 /// Plugin for handling automatic movement.

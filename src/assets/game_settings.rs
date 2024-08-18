@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use derive_more::Constructor;
 use serde::Deserialize;
 
-use super::{DefaultLevelSettings, GameAreaSettings, GameStartSettings};
+use crate::assets::{DefaultLevelSettings, GameAreaSettings, GameStartSettings};
 
 /// Loaded as part of the [crate::assets::GameAssets] collection.
 #[derive(Asset, Reflect, Deserialize, Debug, Clone, Constructor)]

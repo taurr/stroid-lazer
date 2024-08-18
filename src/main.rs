@@ -20,7 +20,7 @@ mod tween_events;
 mod ui;
 mod utils;
 
-use self::{
+use crate::{
     assets::GameAssetsPlugin,
     asteroid::AsteroidPlugin,
     background::BackgroundPlugin,

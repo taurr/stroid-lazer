@@ -1,19 +1,17 @@
 use bevy::prelude::*;
 use bevy_persistent::Persistent;
 use strum::IntoEnumIterator;
-use tracing::instrument;
 
 use crate::{
     assets::{HighScoreBoard, HighScoreKey},
     player::{Player, Score},
     states::GameOverReason,
-    ui::interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+    ui::{
+        constants::{H1_FONT_SIZE, H2_FONT_SIZE, TITLE_FONT_SIZE},
+        interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+        UiSet,
+    },
     GameState, PlayState,
-};
-
-use super::{
-    constants::{H1_FONT_SIZE, H2_FONT_SIZE, TITLE_FONT_SIZE},
-    UiSet,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -35,7 +33,6 @@ pub fn build_ui(app: &mut App) {
     }
 }
 
-#[instrument(skip_all)]
 fn spawn_ui(
     state: Res<State<PlayState>>,
     score_query: Query<(&Score, Option<&HighScoreKey>), With<Player>>,
@@ -81,11 +78,11 @@ fn spawn_ui(
                         ..Default::default()
                     },
                 ));
-                let place = match highscore.place() {
-                    0 => "1st place".to_string(),
-                    1 => "2nd place".to_string(),
-                    2 => "3rd place".to_string(),
-                    place => format!("{}th place", place + 1),
+                let place = match highscore.place() + 1 {
+                    1 => "1st place".to_string(),
+                    2 => "2nd place".to_string(),
+                    3 => "3rd place".to_string(),
+                    place => format!("{place}th place"),
                 };
                 cmd.spawn(TextBundle::from_section(
                     place,

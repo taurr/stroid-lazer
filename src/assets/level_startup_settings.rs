@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use super::{AsteroidSelection, AsteroidSplitCount};
+use crate::assets::{AsteroidSelection, AsteroidSplitCount};
+
 #[derive(Resource, Deserialize, Reflect, Debug, Clone)]
 pub struct LevelStartupSettings {
     pub asteroids: LevelAsteroidStartupSettings,

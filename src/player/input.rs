@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
-use tracing::instrument;
 
-use crate::assets::InputKeySettings;
-
-use super::*;
+use crate::{
+    assets::InputKeySettings,
+    player::{Accelerating, Jumping, Player, PlayerFireEvent, PlayerJumpingEvent, Turning},
+};
 
 /// Actions that can be performed by the player.
 #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
@@ -16,7 +16,6 @@ pub enum PlayerAction {
     HyperJump,
 }
 
-#[instrument(skip_all)]
 pub fn accept_player_input(
     input_query: Query<
         (
@@ -26,7 +25,7 @@ pub fn accept_player_input(
             Option<&Accelerating>,
             Option<&Turning>,
         ),
-        With<Player>
+        With<Player>,
     >,
     mut commands: Commands,
     time: Res<Time>,

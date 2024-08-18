@@ -1,10 +1,13 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use tracing::instrument;
 
-use crate::projectile::Projectile;
-
-use super::*;
+use crate::{
+    movement::{
+        AutoMovementPaused, ClampMovementSpeed, GameArea, PauseMovement, PausedAngularVelocity,
+        PausedLinearVelocity, Wrapping, WrappingGameAreaOn,
+    },
+    projectile::Projectile,
+};
 
 pub fn wrap_rigid_bodies(
     mut query: Query<(&mut Position, &WrappingGameAreaOn)>,
@@ -79,7 +82,6 @@ pub fn pause_movement(
     }
 }
 
-#[instrument(skip_all)]
 pub fn on_wrapping_added(
     mut commands: Commands,
     wrapped_query: Query<Entity, (With<Wrapping>, Without<WrappingGameAreaOn>)>,

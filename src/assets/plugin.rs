@@ -5,14 +5,15 @@ use bevy_asset_loader::prelude::*;
 use bevy_common_assets::ron::RonAssetPlugin;
 use bevy_persistent::{Persistent, StorageFormat};
 
-use crate::states::GameState;
-
-use super::{
-    game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
-    AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
-    AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings, GameLevelSettingsCollection,
-    GameSettings, GameStartSettings, HighScoreBoard, InputKeySettings, SpriteSheetAsset,
-    StateBackgrounds, TextureCount, WeaponCollection,
+use crate::{
+    assets::{
+        game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
+        AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
+        AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings,
+        GameLevelSettingsCollection, GameSettings, GameStartSettings, HighScoreBoard,
+        InputKeySettings, SpriteSheetAsset, StateBackgrounds, TextureCount, WeaponCollection,
+    },
+    states::GameState,
 };
 
 pub struct GameAssetsPlugin;

@@ -30,7 +30,7 @@ pub struct SpriteSheetAsset {
 #[derive(Component, Reflect, Debug, Clone, Copy)]
 pub struct TextureCount(usize);
 
-pub trait EntityCommandsExt {
+pub trait EntitySpriteSheetCommands {
     fn insert_spritesheet<F: Fn() -> T, T: Bundle>(
         &mut self,
         spritesheet: &SpriteSheetAsset,
@@ -40,7 +40,7 @@ pub trait EntityCommandsExt {
 }
 
 // TODO: is this a custom [Command]?
-impl<'a> EntityCommandsExt for EntityCommands<'a> {
+impl<'a> EntitySpriteSheetCommands for EntityCommands<'a> {
     fn insert_spritesheet<F: Fn() -> T, T: Bundle>(
         &mut self,
         spritesheet: &SpriteSheetAsset,

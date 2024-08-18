@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use bevy_turborand::RngComponent;
 use serde::Deserialize;
 
-use crate::utils::RngComponentExt;
-
-//use super::optional;
-use super::{AsteroidPool, AsteroidPoolCollection};
+use crate::{
+    assets::{AsteroidPool, AsteroidPoolCollection},
+    utils::RngComponentExt,
+};
 
 #[derive(Deserialize, Debug, Reflect, Clone)]
 pub enum AsteroidSelection {

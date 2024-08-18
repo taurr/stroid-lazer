@@ -1,7 +1,9 @@
 use bevy::{prelude::*, utils::HashMap};
 use serde::Deserialize;
 
-use super::{game_assets::GameAssets, optional, LevelStartupSettings, PlayerSettingOptions};
+use crate::assets::{
+    game_assets::GameAssets, optional, LevelStartupSettings, PlayerSettingOptions,
+};
 
 /// Resource is initialized after loading assets, through its [FromWorld] implementation.
 #[derive(Asset, Resource, Deserialize, Reflect, Debug, Clone, Deref)]

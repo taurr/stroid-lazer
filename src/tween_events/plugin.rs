@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::systems::handle_tween_completed;
+use crate::tween_events::systems::handle_tween_completed;
 
 pub struct TweenCompletedPlugin;
 

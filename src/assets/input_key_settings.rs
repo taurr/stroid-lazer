@@ -3,8 +3,8 @@ use core::time::Duration;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::game_assets::GameAssets;
-//use super::optional;
+use crate::assets::game_assets::GameAssets;
+//use crate::assets::optional;
 
 /// Loaded directly as part of the [crate::assets::GameAssets] collection, then inserted as a [Resource].
 #[derive(Asset, Resource, Deserialize, Serialize, Reflect, Debug, Clone)]

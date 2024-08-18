@@ -21,21 +21,11 @@ mod weapon_collection;
 
 pub mod game_assets;
 
-pub use self::{plugin::*, sprite_dynamic_asset_collection::*};
-pub use ammonition_depot::*;
-pub use ammonition_texture_collection::*;
-pub use asteroid_pool_collection::*;
-pub use asteroid_selection::*;
-pub use asteroid_texture_collection::*;
-pub use default_level_settings::*;
-pub use game_area_settings::*;
-pub use game_level_settings::*;
-pub use game_settings::*;
-pub use game_start_settings::*;
-pub use highscores::*;
-pub use input_key_settings::*;
-pub use level_startup_settings::*;
-pub use player_settings::*;
-pub use sprite_sheet_asset::*;
-pub use state_backgrounds::*;
-pub use weapon_collection::*;
+pub use self::{
+    ammonition_depot::*, ammonition_texture_collection::*, asteroid_pool_collection::*,
+    asteroid_selection::*, asteroid_texture_collection::*, default_level_settings::*,
+    game_area_settings::*, game_level_settings::*, game_settings::*, game_start_settings::*,
+    highscores::*, input_key_settings::*, level_startup_settings::*, player_settings::*, plugin::*,
+    sprite_dynamic_asset_collection::*, sprite_sheet_asset::*, state_backgrounds::*,
+    weapon_collection::*,
+};

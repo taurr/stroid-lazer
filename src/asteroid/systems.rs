@@ -3,14 +3,17 @@ use std::f32::consts::TAU;
 use avian2d::prelude::*;
 use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
-use tracing::instrument;
 
 use crate::{
     assets::{
         AsteroidDisplacement, AsteroidHitBehavior, AsteroidPool, AsteroidPoolCollection,
         AsteroidSpeedRange, AsteroidSplitCount, AsteroidSplitSelectionExt,
-        AsteroidTextureCollection, AsteroidTextureSelection, EntityCommandsExt, GameAreaSettings,
-        GameLevelSettings, PlayerSettings,
+        AsteroidTextureCollection, AsteroidTextureSelection, EntitySpriteSheetCommands,
+        GameAreaSettings, GameLevelSettings, PlayerSettings,
+    },
+    asteroid::{
+        Asteroid, AsteroidCount, AsteroidHitEvent, AsteroidRemoveEvent, AsteroidSpawnNewEvent,
+        AsteroidSprite, HitBehavior,
     },
     constants::ASTEROID_Z_RANGE,
     movement::{GameArea, PauseMovement, Wrapping},
@@ -21,16 +24,12 @@ use crate::{
     CollisionLayer, GameState, PlayingField,
 };
 
-use super::*;
-
-#[instrument(skip_all)]
 pub fn resume_asteroid_movement(mut commands: Commands, query: Query<Entity, With<Asteroid>>) {
     for entity in query.iter() {
         commands.entity(entity).remove::<PauseMovement>();
     }
 }
 
-#[instrument(skip_all)]
 pub fn despawn_all_asteroids(mut commands: Commands, query: Query<Entity, With<Asteroid>>) {
     debug!("despawning old asteroids");
     for asteroid in query.iter() {
@@ -39,8 +38,8 @@ pub fn despawn_all_asteroids(mut commands: Commands, query: Query<Entity, With<A
 }
 
 /// System responsible for spawning the asteroids at the beginning of a new level.
+/// [despawn_all_asteroids]
 #[allow(clippy::too_many_arguments)]
-#[instrument(skip_all)]
 pub fn spawn_level_asteroids(
     mut playing_field: Query<(Entity, &mut RngComponent), With<PlayingField>>,
     mut commands: Commands,
@@ -102,7 +101,6 @@ pub fn spawn_level_asteroids(
 }
 
 #[cfg(feature = "dbg_colliders")]
-#[instrument(skip_all)]
 pub fn spawn_debug_asteroids(
     mut playing_field: Query<(Entity, &mut RngComponent), With<PlayingField>>,
     mut commands: Commands,
@@ -141,7 +139,6 @@ pub fn spawn_debug_asteroids(
     }
 }
 
-#[instrument(skip_all)]
 pub fn on_asteroid_spawn_new(
     trigger: Trigger<AsteroidSpawnNewEvent>,
     mut rand: Query<&mut RngComponent, With<PlayingField>>,
@@ -158,7 +155,7 @@ pub fn on_asteroid_spawn_new(
             StateScoped(event.state),
             SpatialBundle {
                 transform: Transform::from_translation(event.position),
-                ..Default::default()
+                ..default()
             },
             Name::new("Asteroid"),
             Asteroid,
@@ -185,7 +182,6 @@ pub fn on_asteroid_spawn_new(
     });
 }
 
-#[instrument(skip_all)]
 pub fn on_remove_asteroid(
     mut remove_events: EventReader<AsteroidRemoveEvent>,
     mut commands: Commands,
@@ -197,19 +193,16 @@ pub fn on_remove_asteroid(
     }
 }
 
-#[instrument(skip_all)]
 pub fn init_asteroid_counter(mut counter: ResMut<AsteroidCount>) {
     **counter = 0;
     trace!(asteroid_count = **counter);
 }
 
-#[instrument(skip_all)]
 pub fn on_asteroid_added(_trigger: Trigger<OnAdd, Asteroid>, mut counter: ResMut<AsteroidCount>) {
     **counter += 1;
     debug!(asteroid_count = **counter);
 }
 
-#[instrument(skip_all)]
 pub fn on_asteroid_removed(
     _trigger: Trigger<OnRemove, Asteroid>,
     mut counter: ResMut<AsteroidCount>,
@@ -220,7 +213,6 @@ pub fn on_asteroid_removed(
     }
 }
 
-#[instrument(skip_all)]
 pub fn detect_asteroid_hits(
     mut projectile_hit_events: EventReader<ProjectileCollisionEvent>,
     collider_query: Query<&ColliderParent, With<AsteroidSprite>>,
@@ -260,7 +252,6 @@ pub fn detect_asteroid_hits(
 }
 
 #[allow(clippy::too_many_arguments)]
-#[instrument(skip_all)]
 pub fn on_asteroid_hit(
     trigger: Trigger<AsteroidHitEvent>,
     mut playing_field: Query<(Entity, &mut RngComponent), With<PlayingField>>,
@@ -352,8 +343,9 @@ pub fn on_asteroid_hit(
 
 // region: general functions
 
-#[instrument(skip_all)]
+/// This is a doc comment
 fn add_to_score(score: usize, players: &[Entity], score_events: &mut EventWriter<AddToScoreEvent>) {
+    // and a normal comment
     let score = (score as f32 / players.len() as f32).ceil() as usize;
     for player in players.iter() {
         score_events.send(AddToScoreEvent {
@@ -394,6 +386,7 @@ fn spawn_asteroid_from_pool(
                     warn!(spritesheet_key, "Could not find sprite sheet");
                     return;
                 };
+
                 let index = index.unwrap_or(spritesheet.atlas_index);
                 let atlas_index = if spritesheet.texture_count <= index {
                     warn!(

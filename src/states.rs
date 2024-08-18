@@ -2,7 +2,6 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_asset_loader::prelude::*;
 use bevy_turborand::{GlobalRng, RngComponent};
 use strum_macros::EnumIter;
-use tracing::instrument;
 
 use crate::{
     assets::GameAreaSettings,
@@ -79,7 +78,6 @@ impl Plugin for GameStatesPlugin {
     }
 }
 
-#[instrument(skip_all)]
 fn setup_camera_and_playing_field(
     settings: Res<GameAreaSettings>,
     asset_server: Res<AssetServer>,
