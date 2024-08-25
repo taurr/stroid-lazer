@@ -7,10 +7,10 @@ macro_rules! spawn_menu {
                     style: Style {
                         width: Val::Percent(100.0),
                         height: Val::Percent(100.0),
-                        align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
                         display: Display::Flex,
-                            flex_direction: FlexDirection::Column,
+                        flex_direction: FlexDirection::Column,
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
                         ..Default::default()
                     },
                     background_color: crate::ui::constants::BACKDROP_COLOR.into(),
@@ -20,10 +20,10 @@ macro_rules! spawn_menu {
             .with_children(|cmd| {
                 cmd.spawn(NodeBundle {
                         style: Style {
-                            width: crate::ui::constants::BUTTON_WIDTH,
+                            width: crate::ui::constants::MENU_BUTTON_WIDTH,
+                            flex_direction: FlexDirection::Column,
                             row_gap: crate::ui::constants::BUTTON_GAP_HEIGHT,
                             display: Display::Flex,
-                            flex_direction: FlexDirection::Column,
                             ..Default::default()
                         },
                         ..Default::default()
@@ -37,15 +37,15 @@ macro_rules! spawn_menu {
                                 crate::ui::interaction::InteractionIdComponent($button_event),
                                 ButtonBundle {
                                     style: Style {
-                                        height: crate::ui::constants::BUTTON_HEIGHT,
-                                        align_items: AlignItems::Center,
                                         justify_content: JustifyContent::Center,
-                                        border: crate::ui::constants::BORDER_SIZE,
+                                        align_items: AlignItems::Center,
+                                        border: crate::ui::constants::BUTTON_BORDER_SIZE,
+                                        padding: crate::ui::constants::BUTTON_PADDING,
                                         ..Default::default()
                                     },
+                                    border_radius: crate::ui::constants::BUTTON_BORDER_RADIUS,
                                     background_color: crate::ui::constants::NORMAL_BUTTON.into(),
-                                    border_color: crate::ui::constants::BORDER_COLOR.into(),
-                                    border_radius: crate::ui::constants::BORDER_RADIUS,
+                                    border_color: crate::ui::constants::BUTTON_BORDER_COLOR.into(),
                                     ..Default::default()
                                 },
                             ))

@@ -63,8 +63,8 @@ fn main() -> AppExit {
                         resolution: Vec2::new(800., 800.).into(),
                         present_mode: bevy::window::PresentMode::Fifo,
                         resize_constraints: WindowResizeConstraints {
-                            min_width: 550.0,
-                            min_height: 400.0,
+                            min_width: 800.0,
+                            min_height: 800.0,
                             ..Default::default()
                         },
                         ..default()

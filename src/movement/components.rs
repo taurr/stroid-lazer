@@ -34,15 +34,26 @@ pub struct PausedAngularVelocity(pub AngularVelocity);
 /// component in the hierarchy.
 #[derive(Component, Reflect, Debug, Clone, Deserialize, Serialize)]
 pub struct GameArea {
-    pub min: Vec3,
-    pub max: Vec3,
+    min: Vec3,
+    max: Vec3,
 }
 
 impl GameArea {
+    #[allow(unused)]
     pub fn new(min: Vec3, max: Vec3) -> Self {
         assert!(min.x <= max.x);
         assert!(min.y <= max.y);
         Self { min, max }
+    }
+
+    #[allow(unused)]
+    pub fn min(&self) -> Vec3 {
+        self.min
+    }
+
+    #[allow(unused)]
+    pub fn max(&self) -> Vec3 {
+        self.max
     }
 
     pub fn horizontal_range(&self) -> Range<f32> {

@@ -42,9 +42,9 @@ impl HighScore {
     }
 }
 
-#[derive(Component, Debug, Eq)]
+#[derive(Resource, Debug, Eq)]
 pub struct HighScoreKey {
-    key: Uuid,
+    key: Option<Uuid>,
     place: usize,
 }
 
@@ -83,7 +83,7 @@ impl HighScoreBoard {
     ) -> Option<HighScoreKey> {
         let mut place_map = SCORE_INDEX_KEYS.lock().unwrap();
 
-        if let Some(HighScoreKey { key, .. }) = old_key {
+        if let Some(HighScoreKey { key: Some(key), .. }) = old_key {
             if let Some(old_place) = place_map.remove(key) {
                 self.scores.remove(old_place);
             }
@@ -106,7 +106,10 @@ impl HighScoreBoard {
                 self.scores.remove(NUM_HIGH_SCORES);
             }
 
-            return Some(HighScoreKey { key, place });
+            return Some(HighScoreKey {
+                key: Some(key),
+                place,
+            });
         };
 
         if self.scores.len() < NUM_HIGH_SCORES {
@@ -117,15 +120,21 @@ impl HighScoreBoard {
             self.scores.push(HighScore::new(DEFAULT_USER, score));
             place_map.insert(key, place);
 
-            return Some(HighScoreKey { key, place });
+            return Some(HighScoreKey {
+                key: Some(key),
+                place,
+            });
         }
 
         None
     }
 
-    pub fn assign_name(&mut self, name: &str, key: HighScoreKey) {
+    pub fn assign_name(&mut self, name: &str, key: &mut HighScoreKey) {
+        let Some(key) = key.key.take() else {
+            return;
+        };
         let mut place_map = SCORE_INDEX_KEYS.lock().unwrap();
-        if let Some(index) = place_map.remove(&key.key) {
+        if let Some(index) = place_map.remove(&key) {
             self.scores[index].name = name.to_string();
         }
     }

@@ -459,7 +459,7 @@ fn calc_intersection(position: Vec2, direction: f32, area: &GameArea) -> Vec2 {
         intersection.y = possible_intersection.y;
     }
 
-    intersection = intersection.clamp(area.min.truncate(), area.max.truncate());
+    intersection = intersection.clamp(area.min().truncate(), area.max().truncate());
     intersection
 }
 
