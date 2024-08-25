@@ -1,6 +1,6 @@
 (
     game_start: (
-        lives: 3,
+        lives: 1,
         level: "Training Wheels",
         weapon_key: "3-port-special",
         //weapon_key: "1-port-red-laser",

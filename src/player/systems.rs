@@ -300,14 +300,14 @@ pub fn clear_safe_radius(
 pub fn update_player_score(
     mut add_score_event: EventReader<AddToScoreEvent>,
     mut highscores: ResMut<Persistent<HighScoreBoard>>,
-    mut score_query: Query<(&mut Score, Option<&HighScoreKey>)>,
+    highscore_key: Option<Res<HighScoreKey>>,
+    mut score_query: Query<&mut Score>,
     game_start_settings: Res<GameStartSettings>,
     mut commands: Commands,
 ) {
     for hit_evt in add_score_event.read() {
         let player = hit_evt.player;
-        let (mut score, highscore_key) = score_query.get_mut(player).unwrap();
-
+        let mut score = score_query.get_mut(player).unwrap();
         let new_score = **score + hit_evt.score;
 
         // add new life
@@ -317,13 +317,13 @@ pub fn update_player_score(
             commands.trigger_targets(NewLife, player);
         }
 
-        // update highscore
+        // update score
         **score = new_score;
 
         // maybe update highscore key
-        if let Some(new_highscore_key) = highscores.add_score(*score, highscore_key) {
+        if let Some(new_highscore_key) = highscores.add_score(*score, highscore_key.as_deref()) {
             debug!(?score, "Highscore reached");
-            commands.entity(player).insert(new_highscore_key);
+            commands.insert_resource(new_highscore_key);
         }
     }
 }
@@ -378,12 +378,12 @@ pub fn on_player_jumping(
         loop {
             let game_area = &game_area_settings.game_area;
 
-            let min_x = game_area.min.x;
-            let max_x = game_area.max.x;
+            let min_x = game_area.min().x;
+            let max_x = game_area.max().x;
             let x = min_x.lerp(max_x, rand.f32());
 
-            let min_y = game_area.min.y;
-            let max_y = game_area.max.y;
+            let min_y = game_area.min().y;
+            let max_y = game_area.max().y;
             let y = min_y.lerp(max_y, rand.f32());
 
             let destination = Vec3::new(x, y, PLAYER_Z_POS);
