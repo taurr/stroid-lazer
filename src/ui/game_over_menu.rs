@@ -13,8 +13,9 @@ use crate::{
     player::{Player, Score},
     states::GameOverReason,
     ui::{
-        constants::{BUTTON_PADDING, H1_FONT_SIZE, H3_FONT_SIZE},
+        constants::{BUTTON_PADDING, H1_FONT_SIZE, H3_FONT_SIZE, MAX_NAME_LENGTH},
         interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
+        menu::ButtonBuilderExt,
         UiSet,
     },
     GameState, PlayState,
@@ -188,7 +189,7 @@ fn setup_highscore_menu(
             });
             cmd.spawn((NodeBundle {
                 style: Style {
-                    width: Val::Px(600.0),
+                    width: Val::Px(400.0),
                     display: Display::Flex,
                     flex_direction: FlexDirection::Row,
                     padding: BUTTON_PADDING,
@@ -218,7 +219,7 @@ fn setup_highscore_menu(
                             timer: Timer::from_seconds(0.333, TimerMode::Repeating),
                         },
                         TextBundle::from_section(
-                            "|",
+                            " ",
                             TextStyle {
                                 font_size: crate::ui::constants::BUTTON_FONT_SIZE,
                                 color: crate::ui::constants::TEXT_COLOR,
@@ -229,7 +230,7 @@ fn setup_highscore_menu(
                 });
             cmd.spawn(NodeBundle {
                 style: Style {
-                    width: Val::Px(600.0),
+                    width: Val::Px(400.0),
                     display: Display::Flex,
                     flex_direction: FlexDirection::Row,
                     justify_content: JustifyContent::End,
@@ -238,7 +239,7 @@ fn setup_highscore_menu(
                 ..Default::default()
             })
             .with_children(|cmd| {
-                button("Save", GameOverButton::MainMenu, cmd);
+                cmd.spawn_button("Save", GameOverButton::MainMenu);
             });
         });
 }
@@ -281,13 +282,13 @@ fn text_input_system(
         }
         match &key.logical_key {
             keyboard::Key::Space => {
-                if text.value.is_empty() || text.value.len() > 32 {
+                if text.value.is_empty() || text.value.len() > MAX_NAME_LENGTH {
                     continue;
                 }
                 text.value.push(' ');
             }
             keyboard::Key::Character(input) => {
-                if text.value.len() > 32 {
+                if text.value.len() > MAX_NAME_LENGTH {
                     continue;
                 }
                 if input.chars().any(|c| c.is_control()) {
@@ -309,42 +310,6 @@ fn text_input_system(
             _ => {}
         }
     }
-}
-
-fn button<E: InteractionId + 'static>(
-    text: &str,
-    button_event: E,
-    cmd: &mut ChildBuilder,
-) -> Entity {
-    cmd.spawn((
-        Name::new(format!("{} Button", text)),
-        crate::ui::interaction::InteractionIdComponent(button_event),
-        ButtonBundle {
-            style: Style {
-                margin: UiRect::top(Val::Px(5.0)),
-                padding: UiRect::new(Val::Px(15.0), Val::Px(15.0), Val::Px(5.0), Val::Px(5.0)),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                border: crate::ui::constants::BUTTON_BORDER_SIZE,
-                ..Default::default()
-            },
-            background_color: crate::ui::constants::NORMAL_BUTTON.into(),
-            border_color: crate::ui::constants::BUTTON_BORDER_COLOR.into(),
-            border_radius: crate::ui::constants::BUTTON_BORDER_RADIUS,
-            ..Default::default()
-        },
-    ))
-    .with_children(|cmd| {
-        cmd.spawn(TextBundle::from_section(
-            text,
-            TextStyle {
-                font_size: crate::ui::constants::BUTTON_FONT_SIZE,
-                color: crate::ui::constants::TEXT_COLOR,
-                ..Default::default()
-            },
-        ));
-    })
-    .id()
 }
 
 fn handle_game_over_menu(

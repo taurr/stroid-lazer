@@ -8,6 +8,9 @@ pub struct StateBackgrounds {
     #[asset(key = "background-main-menu")]
     pub main_menu: Handle<Image>,
 
+    #[asset(key = "background-highscores-menu")]
+    pub highscores_menu: Handle<Image>,
+
     #[asset(key = "background-game-over")]
     pub game_over: Handle<Image>,
 
