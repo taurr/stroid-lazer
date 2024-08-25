@@ -71,7 +71,9 @@ fn handle_main_menu(
             MainMenuButton::Play => {
                 next_state.set(GameState::Playing);
             }
-            MainMenuButton::HighScore => {}
+            MainMenuButton::HighScore => {
+                next_state.set(GameState::HighscoreMenu);
+            }
             MainMenuButton::Quit => {
                 exit.send(AppExit::Success);
             }

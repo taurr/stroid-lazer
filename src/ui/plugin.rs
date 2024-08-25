@@ -13,6 +13,7 @@ impl Plugin for UiPlugin {
         super::countdown_ui::build_ui(app);
         super::paused_menu::build_ui(app);
         super::game_over_menu::build_ui(app);
+        super::highscore_ui::build_ui(app);
 
         #[cfg(feature = "dbg_colliders")]
         super::dbg_colliders::build_ui(app);

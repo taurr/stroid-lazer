@@ -49,6 +49,7 @@ fn set_state_background(
     let background = match **game_state {
         GameState::LoadingAssets => None,
         GameState::MainMenu => Some(backgrounds.main_menu.clone()),
+        GameState::HighscoreMenu => Some(backgrounds.highscores_menu.clone()),
         GameState::Playing => match **play_state.unwrap() {
             PlayState::CountdownBeforeRunning => level_settings
                 .map(|s| s.background.clone())

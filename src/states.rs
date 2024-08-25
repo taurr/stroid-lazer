@@ -25,6 +25,7 @@ pub enum GameState {
     #[cfg(feature = "dbg_colliders")]
     DebugColliders,
     MainMenu,
+    HighscoreMenu,
     Playing,
 }
 
