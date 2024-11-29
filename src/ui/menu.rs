@@ -9,7 +9,7 @@ pub trait ButtonBuilderExt {
     fn spawn_button<E: InteractionId + 'static>(&mut self, text: &str, button_event: E) -> Entity;
 }
 
-impl<'a> ButtonBuilderExt for ChildBuilder<'a> {
+impl ButtonBuilderExt for ChildBuilder<'_> {
     fn spawn_button<E: InteractionId + 'static>(&mut self, text: &str, button_event: E) -> Entity {
         self.spawn((
             Name::new(format!("{} Button", text)),

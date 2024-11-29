@@ -58,7 +58,7 @@ pub struct PlayerSpriteSheet<'w> {
     spritesheet_assets: Res<'w, Assets<SpriteSheetAsset>>,
 }
 
-impl<'w> PlayerSpriteSheet<'w> {
+impl PlayerSpriteSheet<'_> {
     pub fn spritesheet(&self) -> &SpriteSheetAsset {
         self.spritesheet_assets
             .get(self.game_assets.player_spritesheet_handle.id())
@@ -72,7 +72,7 @@ pub struct FlameSpriteSheet<'w> {
     spritesheet_assets: Res<'w, Assets<SpriteSheetAsset>>,
 }
 
-impl<'w> FlameSpriteSheet<'w> {
+impl FlameSpriteSheet<'_> {
     pub fn spritesheet(&self) -> &SpriteSheetAsset {
         self.spritesheet_assets
             .get(self.game_assets.flames_spritesheet_handle.id())

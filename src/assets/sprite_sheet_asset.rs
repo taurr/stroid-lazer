@@ -40,7 +40,7 @@ pub trait EntitySpriteSheetCommands {
 }
 
 // TODO: is this a custom [Command]?
-impl<'a> EntitySpriteSheetCommands for EntityCommands<'a> {
+impl EntitySpriteSheetCommands for EntityCommands<'_> {
     fn insert_spritesheet<F: Fn() -> T, T: Bundle>(
         &mut self,
         spritesheet: &SpriteSheetAsset,

@@ -7,7 +7,6 @@ use bevy::{
     },
     prelude::*,
     text::BreakLineOn,
-    ui::widget::TextFlags,
 };
 use bevy_persistent::Persistent;
 use chrono::{DateTime, Utc};
