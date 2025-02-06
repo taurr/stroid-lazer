@@ -5,6 +5,7 @@ use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
 
 use crate::{
+    CollisionLayer, GameState, PlayingField,
     assets::{
         AsteroidDisplacement, AsteroidHitBehavior, AsteroidPool, AsteroidPoolCollection,
         AsteroidSpeedRange, AsteroidSplitCount, AsteroidSplitSelectionExt,
@@ -21,7 +22,6 @@ use crate::{
     projectile::ProjectileCollisionEvent,
     states::PlayState,
     utils::RngComponentExt,
-    CollisionLayer, GameState, PlayingField,
 };
 
 pub fn resume_asteroid_movement(mut commands: Commands, query: Query<Entity, With<Asteroid>>) {
@@ -173,10 +173,10 @@ pub fn on_asteroid_spawn_new(
         asteroid.insert_spritesheet(&event.spritesheet, Some(event.atlas_index), || {
             (
                 AsteroidSprite,
-                CollisionLayers::new(
-                    [CollisionLayer::Asteroids],
-                    [CollisionLayer::Player, CollisionLayer::Laser],
-                ),
+                CollisionLayers::new([CollisionLayer::Asteroids], [
+                    CollisionLayer::Player,
+                    CollisionLayer::Laser,
+                ]),
             )
         });
     });

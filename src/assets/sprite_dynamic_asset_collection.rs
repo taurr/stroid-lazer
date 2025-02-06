@@ -13,7 +13,7 @@ use bevy_asset_loader::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::assets::{
-    optional, AmmonitionTextureCollection, AsteroidTextureCollection, SpriteSheetAsset,
+    AmmonitionTextureCollection, AsteroidTextureCollection, SpriteSheetAsset, optional,
 };
 
 #[derive(Asset, TypePath, Deserialize, Debug, Default, Clone)]

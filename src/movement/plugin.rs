@@ -3,8 +3,8 @@ use bevy::prelude::*;
 
 use crate::{
     movement::{
-        systems::*, ClampMovementSpeed, GameArea, PausedAngularVelocity, PausedLinearVelocity,
-        WrappingGameAreaOn,
+        ClampMovementSpeed, GameArea, PausedAngularVelocity, PausedLinearVelocity,
+        WrappingGameAreaOn, systems::*,
     },
     states::PlayState,
 };

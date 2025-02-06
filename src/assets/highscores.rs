@@ -84,8 +84,11 @@ impl HighScoreBoard {
         let mut place_map = SCORE_INDEX_KEYS.lock().unwrap();
 
         if let Some(HighScoreKey { key: Some(key), .. }) = old_key {
-            if let Some(old_place) = place_map.remove(key) {
-                self.scores.remove(old_place);
+            match place_map.remove(key) {
+                Some(old_place) => {
+                    self.scores.remove(old_place);
+                }
+                _ => {}
             }
         }
 
@@ -134,8 +137,11 @@ impl HighScoreBoard {
             return;
         };
         let mut place_map = SCORE_INDEX_KEYS.lock().unwrap();
-        if let Some(index) = place_map.remove(&key) {
-            self.scores[index].name = name.to_string();
+        match place_map.remove(&key) {
+            Some(index) => {
+                self.scores[index].name = name.to_string();
+            }
+            _ => {}
         }
     }
 }

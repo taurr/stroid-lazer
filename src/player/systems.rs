@@ -12,21 +12,21 @@ use itertools::Itertools;
 use leafwing_input_manager::prelude::*;
 
 use crate::{
+    CollisionLayer, GameState, PlayState, PlayingField,
     assets::{
-        game_assets::PlayerSpriteSheet, EntitySpriteSheetCommands, GameAreaSettings,
-        GameStartSettings, HighScoreBoard, HighScoreKey, InputKeySettings, PlayerSettings,
+        EntitySpriteSheetCommands, GameAreaSettings, GameStartSettings, HighScoreBoard,
+        HighScoreKey, InputKeySettings, PlayerSettings, game_assets::PlayerSpriteSheet,
     },
     asteroid::AsteroidSprite,
     constants::PLAYER_Z_POS,
     movement::{ClampMovementSpeed, PauseMovement, PausedLinearVelocity, Wrapping},
     player::{
-        input::PlayerAction, Accelerating, AddToScoreEvent, Dead, EquippedWeapon, Jumping, NewLife,
-        Player, PlayerDeadEvent, PlayerFireEvent, PlayerJumpFinishedEvent, PlayerJumpingEvent,
-        PlayerSprite, Score, Turning,
+        Accelerating, AddToScoreEvent, Dead, EquippedWeapon, Jumping, NewLife, Player,
+        PlayerDeadEvent, PlayerFireEvent, PlayerJumpFinishedEvent, PlayerJumpingEvent,
+        PlayerSprite, Score, Turning, input::PlayerAction,
     },
     projectile::SpawnProjectilesEvent,
     tween_events::TweenCompletedEvent,
-    CollisionLayer, GameState, PlayState, PlayingField,
 };
 
 // region: general systems
@@ -235,10 +235,9 @@ pub fn spawn_new_player(
                     .insert_spritesheet(spritesheet, None, || {
                         (
                             PlayerSprite,
-                            CollisionLayers::new(
-                                [CollisionLayer::Player],
-                                [CollisionLayer::Asteroids],
-                            ),
+                            CollisionLayers::new([CollisionLayer::Player], [
+                                CollisionLayer::Asteroids,
+                            ]),
                         )
                     });
             });
@@ -279,7 +278,7 @@ pub fn clear_safe_radius(
     debug!(safe_radius = player_settings.safe_radius);
     asteroid_query
         .iter()
-        .filter(|(_, a_colider, &a_position, &a_rotation)| {
+        .filter(|&(_, a_colider, &a_position, &a_rotation)| {
             contact_query::intersection_test(
                 &collider, position, rotation, a_colider, a_position, a_rotation,
             )

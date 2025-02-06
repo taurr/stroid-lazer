@@ -30,21 +30,18 @@ impl ButtonBuilderExt for ChildBuilder<'_> {
             },
         ))
         .with_children(|cmd| {
-            cmd.spawn(TextBundle::from_section(
-                text,
-                TextStyle {
-                    font_size: crate::ui::constants::BUTTON_FONT_SIZE,
-                    color: crate::ui::constants::TEXT_COLOR,
-                    ..Default::default()
-                },
-            ));
+            cmd.spawn(TextBundle::from_section(text, TextStyle {
+                font_size: crate::ui::constants::BUTTON_FONT_SIZE,
+                color: crate::ui::constants::TEXT_COLOR,
+                ..Default::default()
+            }));
         })
         .id()
     }
 }
 
 macro_rules! spawn_menu {
-    ($cmd:ident, $state:expr, [$(($button_name:literal, $button_event:expr)),*$(,)?]) => {
+    ($cmd:ident, $state:expr_2021, [$(($button_name:literal, $button_event:expr_2021)),*$(,)?]) => {
         {
             use crate::ui::menu::ButtonBuilderExt;
             let id = $cmd.spawn((

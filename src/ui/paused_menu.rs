@@ -1,14 +1,14 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{
+    PlayState,
     assets::{GameStartSettings, InputKeySettings},
     ui::{
+        UiSet,
         constants::H1_FONT_SIZE,
         countdown_ui::CountdownTimer,
         interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
-        UiSet,
     },
-    PlayState,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -53,11 +53,10 @@ pub fn build_ui(app: &mut App) {
 }
 
 fn spawn_ui(mut commands: Commands) {
-    let menu = spawn_menu!(
-        commands,
-        PlayState::Paused,
-        [("Continue", PausedButton::Continue),]
-    );
+    let menu = spawn_menu!(commands, PlayState::Paused, [(
+        "Continue",
+        PausedButton::Continue
+    ),]);
 
     let headline = commands
         .spawn(NodeBundle {
@@ -68,14 +67,11 @@ fn spawn_ui(mut commands: Commands) {
             ..default()
         })
         .with_children(|cmd| {
-            cmd.spawn(TextBundle::from_section(
-                "Game Paused",
-                TextStyle {
-                    font_size: H1_FONT_SIZE,
-                    color: Color::WHITE,
-                    ..Default::default()
-                },
-            ));
+            cmd.spawn(TextBundle::from_section("Game Paused", TextStyle {
+                font_size: H1_FONT_SIZE,
+                color: Color::WHITE,
+                ..Default::default()
+            }));
         })
         .id();
     commands.entity(menu).insert_children(0, &[headline]);

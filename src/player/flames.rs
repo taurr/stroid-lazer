@@ -1,7 +1,7 @@
 use bevy::{audio::Volume, prelude::*};
 
 use crate::{
-    assets::{game_assets::FlameSpriteSheet, EntitySpriteSheetCommands, PlayerSettings},
+    assets::{EntitySpriteSheetCommands, PlayerSettings, game_assets::FlameSpriteSheet},
     player::Accelerating,
 };
 

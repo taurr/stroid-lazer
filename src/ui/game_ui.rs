@@ -1,11 +1,11 @@
 use bevy::{color::palettes::css, prelude::*};
 
 use crate::{
+    GameLevel, GameState,
     asteroid::AsteroidCount,
     player::{Player, Score},
     states::PlayState,
     ui::UiSet,
-    GameLevel, GameState,
 };
 
 pub fn build_ui(app: &mut App) {
@@ -46,20 +46,17 @@ struct AsteroidText;
 fn spawn_ui(mut commands: Commands) {
     debug!("spawning game ui");
     commands
-        .spawn((
-            StateScoped(GameState::Playing),
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Column,
-                    justify_content: JustifyContent::SpaceBetween,
-                    ..default()
-                },
+        .spawn((StateScoped(GameState::Playing), NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
-        ))
+            ..default()
+        }))
         .with_children(|commands| {
             // Top row
             commands
@@ -80,24 +77,18 @@ fn spawn_ui(mut commands: Commands) {
                             commands.spawn((
                                 Name::new("Level Display"),
                                 TextBundle::from_sections([
-                                    TextSection::new(
-                                        "Level: ",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::WHITE.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    TextSection::new(
-                                        "0",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::GREEN.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
+                                    TextSection::new("Level: ", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::WHITE.into(),
+                                        ..Default::default()
+                                    }),
+                                    TextSection::new("0", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::GREEN.into(),
+                                        ..Default::default()
+                                    }),
                                 ]),
                                 LevelText,
                             ));
@@ -115,24 +106,18 @@ fn spawn_ui(mut commands: Commands) {
                             commands.spawn((
                                 Name::new("Score Display"),
                                 TextBundle::from_sections([
-                                    TextSection::new(
-                                        "Score: ",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::WHITE.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    TextSection::new(
-                                        "0",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::RED.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
+                                    TextSection::new("Score: ", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::WHITE.into(),
+                                        ..Default::default()
+                                    }),
+                                    TextSection::new("0", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::RED.into(),
+                                        ..Default::default()
+                                    }),
                                 ]),
                                 ScoreText,
                             ));
@@ -150,24 +135,18 @@ fn spawn_ui(mut commands: Commands) {
                             commands.spawn((
                                 Name::new("Lives Display"),
                                 TextBundle::from_sections([
-                                    TextSection::new(
-                                        "Lives: ",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::WHITE.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    TextSection::new(
-                                        "0",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::GOLD.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
+                                    TextSection::new("Lives: ", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::WHITE.into(),
+                                        ..Default::default()
+                                    }),
+                                    TextSection::new("0", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::GOLD.into(),
+                                        ..Default::default()
+                                    }),
                                 ]),
                                 LivesText,
                             ));
@@ -194,24 +173,18 @@ fn spawn_ui(mut commands: Commands) {
                             commands.spawn((
                                 Name::new("Asteroids Counter"),
                                 TextBundle::from_sections([
-                                    TextSection::new(
-                                        "Asteroids: ",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::WHITE.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
-                                    TextSection::new(
-                                        "0",
-                                        TextStyle {
-                                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                            font_size: 20.0,
-                                            color: css::LIGHT_BLUE.into(),
-                                            ..Default::default()
-                                        },
-                                    ),
+                                    TextSection::new("Asteroids: ", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::WHITE.into(),
+                                        ..Default::default()
+                                    }),
+                                    TextSection::new("0", TextStyle {
+                                        //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                        font_size: 20.0,
+                                        color: css::LIGHT_BLUE.into(),
+                                        ..Default::default()
+                                    }),
                                 ]),
                                 AsteroidText,
                             ));

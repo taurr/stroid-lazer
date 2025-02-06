@@ -4,13 +4,13 @@ use smart_default::SmartDefault;
 use tracing::*;
 
 use crate::{
+    GameLevel,
     assets::{
         DefaultLevelSettings, GameLevelSettings, GameLevelSettingsCollection, GameStartSettings,
     },
     asteroid::AsteroidCount,
     projectile::Projectile,
     states::{GameOverReason, PlayState},
-    GameLevel,
 };
 
 #[derive(SmartDefault, Debug)]

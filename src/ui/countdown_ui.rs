@@ -3,13 +3,13 @@ use core::time::Duration;
 use bevy::{color::palettes::css, prelude::*};
 
 use crate::{
+    GameLevel, PlayState,
     assets::GameStartSettings,
     levels::GameLevelsSet,
     ui::{
-        constants::{BACKDROP_COLOR, H1_FONT_SIZE, TITLE_FONT_SIZE},
         UiSet,
+        constants::{BACKDROP_COLOR, H1_FONT_SIZE, TITLE_FONT_SIZE},
     },
-    GameLevel, PlayState,
 };
 
 #[derive(Component, Debug, Clone)]
@@ -93,9 +93,8 @@ fn spawn_ui(
     debug!(remaining=?timer.remaining(), "spawning countdown ui");
 
     let menu = commands
-        .spawn((
-            StateScoped(PlayState::CountdownBeforeRunning),
-            NodeBundle {
+        .spawn(
+            (StateScoped(PlayState::CountdownBeforeRunning), NodeBundle {
                 style: Style {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
@@ -107,8 +106,8 @@ fn spawn_ui(
                 },
                 background_color: BACKDROP_COLOR.into(),
                 ..default()
-            },
-        ))
+            }),
+        )
         .with_children(|commands| {
             commands
                 .spawn(NodeBundle::default())
@@ -116,15 +115,12 @@ fn spawn_ui(
                     commands.spawn((
                         Name::new("Countdown Display"),
                         CountdownText,
-                        TextBundle::from_sections([TextSection::new(
-                            "",
-                            TextStyle {
-                                //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                font_size: TITLE_FONT_SIZE,
-                                color: css::WHITE.into(),
-                                ..Default::default()
-                            },
-                        )]),
+                        TextBundle::from_sections([TextSection::new("", TextStyle {
+                            //font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: TITLE_FONT_SIZE,
+                            color: css::WHITE.into(),
+                            ..Default::default()
+                        })]),
                     ));
                 });
         })

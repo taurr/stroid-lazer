@@ -2,8 +2,8 @@ use core::iter::repeat;
 
 use bevy::{
     input::{
-        keyboard::{self, KeyboardInput},
         ButtonState,
+        keyboard::{self, KeyboardInput},
     },
     prelude::*,
     text::BreakLineOn,
@@ -12,14 +12,14 @@ use bevy_persistent::Persistent;
 use chrono::{DateTime, Utc};
 
 use crate::{
+    GameState,
     assets::HighScoreBoard,
     ui::{
+        UiSet,
         constants::{H1_FONT_SIZE, H2_FONT_SIZE, H3_FONT_SIZE},
         interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
         menu::ButtonBuilderExt,
-        UiSet,
     },
-    GameState,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -52,32 +52,26 @@ fn spawn_ui(
     let state = *state.get();
 
     commands
-        .spawn((
-            StateScoped(state),
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    ..Default::default()
-                },
-                background_color: crate::ui::constants::BACKDROP_COLOR.into(),
+        .spawn((StateScoped(state), NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
                 ..Default::default()
             },
-        ))
+            background_color: crate::ui::constants::BACKDROP_COLOR.into(),
+            ..Default::default()
+        }))
         .with_children(|cmd| {
             // title
-            cmd.spawn(TextBundle::from_section(
-                "Highscores",
-                TextStyle {
-                    font_size: H1_FONT_SIZE,
-                    color: Color::WHITE,
-                    ..Default::default()
-                },
-            ));
+            cmd.spawn(TextBundle::from_section("Highscores", TextStyle {
+                font_size: H1_FONT_SIZE,
+                color: Color::WHITE,
+                ..Default::default()
+            }));
             cmd.spawn(NodeBundle {
                 border_color: crate::ui::constants::BUTTON_BORDER_COLOR.into(),
                 border_radius: crate::ui::constants::BUTTON_BORDER_RADIUS,

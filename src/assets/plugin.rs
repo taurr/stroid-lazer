@@ -7,11 +7,11 @@ use bevy_persistent::{Persistent, StorageFormat};
 
 use crate::{
     assets::{
-        game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
         AmmonitionDepot, AmmonitionTextureCollection, AsteroidPoolCollection,
         AsteroidTextureCollection, DefaultLevelSettings, GameAreaSettings,
         GameLevelSettingsCollection, GameSettings, GameStartSettings, HighScoreBoard,
         InputKeySettings, SpriteSheetAsset, StateBackgrounds, TextureCount, WeaponCollection,
+        game_assets::GameAssets, sprite_dynamic_asset_collection::SpriteDynamicAssetCollection,
     },
     states::GameState,
 };

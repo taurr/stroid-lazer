@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use serde::Deserialize;
 
 use crate::{
-    assets::{game_assets::GameAssets, GameSettings},
+    assets::{GameSettings, game_assets::GameAssets},
     movement::GameArea,
 };
 

@@ -2,16 +2,17 @@ use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 use crate::{
+    PlayState,
     levels::GameLevelsSet,
     player::{
-        clear_safe_radius, despawn_old_player, detect_player_collisions,
+        AddToScoreEvent, Player, Score, clear_safe_radius, despawn_old_player,
+        detect_player_collisions,
         flames::init_rocket_flames,
-        input::{accept_player_input, PlayerAction},
+        input::{PlayerAction, accept_player_input},
         on_new_life, on_player_death, on_player_firing, on_player_jump_finished, on_player_jumping,
         player_acceleration_and_turning, reset_player_movement_system, resume_player_movement,
-        spawn_new_player, stop_accelerating, update_player_score, AddToScoreEvent, Player, Score,
+        spawn_new_player, stop_accelerating, update_player_score,
     },
-    PlayState,
 };
 
 pub struct PlayerPlugin;

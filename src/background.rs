@@ -65,7 +65,10 @@ fn set_state_background(
         },
     };
 
-    if let (Some(background), Ok(backgound_entity)) = (background, background_query.get_single()) {
-        commands.entity(backgound_entity).insert(background);
+    match (background, background_query.get_single()) {
+        (Some(background), Ok(backgound_entity)) => {
+            commands.entity(backgound_entity).insert(background);
+        }
+        _ => {}
     }
 }

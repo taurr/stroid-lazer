@@ -1,7 +1,7 @@
 use bevy::{
     input::{
-        keyboard::{self, KeyboardInput},
         ButtonState,
+        keyboard::{self, KeyboardInput},
     },
     prelude::*,
 };
@@ -9,16 +9,16 @@ use bevy_persistent::Persistent;
 use strum::IntoEnumIterator;
 
 use crate::{
+    GameState, PlayState,
     assets::{HighScoreBoard, HighScoreKey},
     player::{Player, Score},
     states::GameOverReason,
     ui::{
+        UiSet,
         constants::{BUTTON_PADDING, H1_FONT_SIZE, H3_FONT_SIZE, MAX_NAME_LENGTH},
         interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
         menu::ButtonBuilderExt,
-        UiSet,
     },
-    GameState, PlayState,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -103,14 +103,10 @@ fn setup_dead_menu(
             ));
         })
         .id();
-    let menu = spawn_menu!(
-        commands,
-        state,
-        [
-            ("Play Again", GameOverButton::PlayAgain),
-            ("Main Menu", GameOverButton::MainMenu),
-        ]
-    );
+    let menu = spawn_menu!(commands, state, [
+        ("Play Again", GameOverButton::PlayAgain),
+        ("Main Menu", GameOverButton::MainMenu),
+    ]);
     commands.entity(menu).insert_children(0, &[headline]);
 }
 
@@ -122,32 +118,26 @@ fn setup_highscore_menu(
     commands: &mut Commands,
 ) {
     commands
-        .spawn((
-            StateScoped(state),
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    display: Display::Flex,
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    ..Default::default()
-                },
-                background_color: crate::ui::constants::BACKDROP_COLOR.into(),
+        .spawn((StateScoped(state), NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
                 ..Default::default()
             },
-        ))
+            background_color: crate::ui::constants::BACKDROP_COLOR.into(),
+            ..Default::default()
+        }))
         .with_children(|cmd| {
             // title
-            cmd.spawn(TextBundle::from_section(
-                "Congratulations",
-                TextStyle {
-                    font_size: H1_FONT_SIZE,
-                    color: Color::WHITE,
-                    ..Default::default()
-                },
-            ));
+            cmd.spawn(TextBundle::from_section("Congratulations", TextStyle {
+                font_size: H1_FONT_SIZE,
+                color: Color::WHITE,
+                ..Default::default()
+            }));
             cmd.spawn(TextBundle::from_section(
                 "You reached the scoreboard",
                 TextStyle {
@@ -205,27 +195,21 @@ fn setup_highscore_menu(
                 .with_children(|cmd| {
                     cmd.spawn((
                         HighScorerName,
-                        TextBundle::from_section(
-                            "",
-                            TextStyle {
-                                font_size: crate::ui::constants::BUTTON_FONT_SIZE,
-                                color: crate::ui::constants::TEXT_COLOR,
-                                ..Default::default()
-                            },
-                        ),
+                        TextBundle::from_section("", TextStyle {
+                            font_size: crate::ui::constants::BUTTON_FONT_SIZE,
+                            color: crate::ui::constants::TEXT_COLOR,
+                            ..Default::default()
+                        }),
                     ));
                     cmd.spawn((
                         Cursor {
                             timer: Timer::from_seconds(0.333, TimerMode::Repeating),
                         },
-                        TextBundle::from_section(
-                            " ",
-                            TextStyle {
-                                font_size: crate::ui::constants::BUTTON_FONT_SIZE,
-                                color: crate::ui::constants::TEXT_COLOR,
-                                ..Default::default()
-                            },
-                        ),
+                        TextBundle::from_section(" ", TextStyle {
+                            font_size: crate::ui::constants::BUTTON_FONT_SIZE,
+                            color: crate::ui::constants::TEXT_COLOR,
+                            ..Default::default()
+                        }),
                     ));
                 });
             cmd.spawn(NodeBundle {

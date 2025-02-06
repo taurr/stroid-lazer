@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 pub fn setup_dbg(app: &mut App) {
-    use crate::{states::GameState, PlayingField};
+    use crate::{PlayingField, states::GameState};
     use avian2d::prelude::*;
     use bevy_turborand::RngComponent;
 

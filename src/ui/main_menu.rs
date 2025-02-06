@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 
 use crate::{
+    GameState,
     ui::{
+        UiSet,
         constants::H1_FONT_SIZE,
         interaction::{InteractionHandlerExt, InteractionId, PressedEvent},
-        UiSet,
     },
-    GameState,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -29,15 +29,11 @@ pub fn build_ui(app: &mut App) {
 }
 
 fn spawn_ui(mut commands: Commands) {
-    let menu = spawn_menu!(
-        commands,
-        GameState::MainMenu,
-        [
-            ("Play", MainMenuButton::Play),
-            ("Highscores", MainMenuButton::HighScore),
-            ("Quit", MainMenuButton::Quit),
-        ]
-    );
+    let menu = spawn_menu!(commands, GameState::MainMenu, [
+        ("Play", MainMenuButton::Play),
+        ("Highscores", MainMenuButton::HighScore),
+        ("Quit", MainMenuButton::Quit),
+    ]);
 
     let headline = commands
         .spawn(NodeBundle {

@@ -2,12 +2,12 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 
 use crate::{
+    PlayState,
     projectile::{
-        despawn_all_projectiles, detect_projetile_collision, on_projectile_spawn,
-        spawn_projectiles, timeout_projectiles, ProjectileCollisionEvent, SpawnProjectilesEvent,
+        ProjectileCollisionEvent, SpawnProjectilesEvent, despawn_all_projectiles,
+        detect_projetile_collision, on_projectile_spawn, spawn_projectiles, timeout_projectiles,
     },
     states::GameState,
-    PlayState,
 };
 
 #[derive(Debug, Clone, Default, SystemSet, PartialEq, Eq, Hash)]

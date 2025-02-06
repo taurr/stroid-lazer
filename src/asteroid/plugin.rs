@@ -2,13 +2,13 @@ use bevy::prelude::*;
 use smart_default::SmartDefault;
 
 use crate::{
+    PlayState,
     asteroid::{
-        despawn_all_asteroids, detect_asteroid_hits, init_asteroid_counter, on_asteroid_added,
-        on_asteroid_hit, on_asteroid_removed, on_asteroid_spawn_new, on_remove_asteroid,
-        resume_asteroid_movement, spawn_level_asteroids, AsteroidCount, AsteroidRemoveEvent,
+        AsteroidCount, AsteroidRemoveEvent, despawn_all_asteroids, detect_asteroid_hits,
+        init_asteroid_counter, on_asteroid_added, on_asteroid_hit, on_asteroid_removed,
+        on_asteroid_spawn_new, on_remove_asteroid, resume_asteroid_movement, spawn_level_asteroids,
     },
     levels::GameLevelsSet,
-    PlayState,
 };
 
 #[derive(Debug, SystemSet, PartialEq, Eq, Hash, Clone)]

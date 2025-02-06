@@ -3,6 +3,7 @@ use bevy::{audio::Volume, prelude::*};
 use bevy_turborand::{DelegatedRng, RngComponent};
 
 use crate::{
+    CollisionLayer, GameState, PlayingField,
     assets::{
         AmmonitionDepot, AmmonitionSelection, AmmonitionTextureCollection,
         EntitySpriteSheetCommands, WeaponCollection,
@@ -14,7 +15,6 @@ use crate::{
         SpawnSingleProjectileEvent,
     },
     utils::RngComponentExt,
-    CollisionLayer, GameState, PlayingField,
 };
 
 pub fn despawn_all_projectiles(

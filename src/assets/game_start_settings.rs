@@ -3,7 +3,7 @@ use core::time::Duration;
 use bevy::prelude::*;
 use serde::Deserialize;
 
-use crate::assets::{game_assets::GameAssets, GameSettings};
+use crate::assets::{GameSettings, game_assets::GameAssets};
 
 /// Resource is initialized after loading assets, through its [FromWorld] implementation.
 #[derive(Resource, Reflect, Deserialize, Debug, Clone)]

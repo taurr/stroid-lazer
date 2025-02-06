@@ -4,13 +4,13 @@ use bevy_turborand::{GlobalRng, RngComponent};
 use strum_macros::EnumIter;
 
 use crate::{
+    PlayingField,
     assets::GameAreaSettings,
     background::Background,
     constants::{
         PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS, PLAYINGFIELD_BORDER_RELATIVE_Z_POS,
         PLAYINGFIELD_POS,
     },
-    PlayingField,
 };
 
 #[cfg_attr(doc, aquamarine::aquamarine)]
@@ -119,21 +119,18 @@ fn setup_camera_and_playing_field(
         ))
         .with_children(|commands| {
             // Place a background behind the PlayingField.
-            commands.spawn((
-                Background,
-                SpriteBundle {
-                    sprite: Sprite {
-                        custom_size: Some(Vec2::new(game_area.width(), game_area.height())),
-                        ..default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(
-                        0.0,
-                        0.0,
-                        PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS,
-                    )),
+            commands.spawn((Background, SpriteBundle {
+                sprite: Sprite {
+                    custom_size: Some(Vec2::new(game_area.width(), game_area.height())),
                     ..default()
                 },
-            ));
+                transform: Transform::from_translation(Vec3::new(
+                    0.0,
+                    0.0,
+                    PLAYINGFIELD_BACKGROUND_RELATIVE_Z_POS,
+                )),
+                ..default()
+            }));
             // Add an entity for displaying a border around the PlayingField.
             // The border helps us hide game elements as they move out or into the game-area,
             // especially in a situation where the window is scaled such that we have an empty
